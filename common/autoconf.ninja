@@ -1,0 +1,5 @@
+include ../common/autoconf-common.ninja
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

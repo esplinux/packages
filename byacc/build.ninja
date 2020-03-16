@@ -1,0 +1,5 @@
+PACKAGE=byacc
+VERSION=20191125
+URL=https://invisible-mirror.net/archives/byacc/${PACKAGE}-${VERSION}.tgz
+
+include ../common/autoconf.ninja

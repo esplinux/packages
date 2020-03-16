@@ -1,0 +1,51 @@
+##############################################################################
+# You should only have to change items below here if you are developing a new
+# new version of esp/bootstrap or porting to a new architecture
+##############################################################################
+
+# Defaults inherited by included build files
+##############################################################################
+tarflags = xz
+
+# Default build rules
+##############################################################################
+
+rule download
+  description = Downloading $URL
+  command = curl --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S $URL| tar $tarflags
+
+rule git
+  description = Cloning $destination
+  command = git clone -q --depth=1 $url $destination
+
+rule package
+  description = Packaging $out
+  command = cd $in; tar -czf ../$out .; cd ..
+
+rule configure
+  command = mkdir -p $$(dirname $out); $
+    cd $$(dirname $out); $
+    $prefix ../$in $opts
+
+rule make
+  description = Building $out
+  command = $prefix make -j$nproc -C $$(dirname $in) $target
+
+rule cmake
+  description = CMAKE $in
+  command = $prefix cmake -B$$(dirname $out) -S$$(dirname $in) $opts
+
+rule mkdir
+  command = mkdir $out
+
+rule cp
+  command = cp $in $out
+
+rule mv
+  command = mv $mv $out
+
+rule rm
+  command = rm -rf $rm
+
+rule patch
+  command = patch -p1 -i $in

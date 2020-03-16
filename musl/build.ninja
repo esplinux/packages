@@ -1,0 +1,5 @@
+PACKAGE=musl
+VERSION=1.2.0
+URL=https://www.musl-libc.org/releases/${PACKAGE}-${VERSION}.tar.gz
+
+include ../common/autoconf-lib.ninja

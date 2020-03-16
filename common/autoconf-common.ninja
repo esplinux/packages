@@ -1,0 +1,19 @@
+include ../common/rules.ninja
+
+build ${PACKAGE}-${VERSION}/configure: download
+
+build build/Makefile: configure ${PACKAGE}-${VERSION}/configure
+  description = Configuring ${PACKAGE}
+  prefix = CFLAGS='-O3 -march=broadwell -mtune=broadwell' LDFLAGS='-s -w'
+  opts = --prefix=''
+
+build out: make build/Makefile
+  description = Building ${PACKAGE}
+  prefix = DESTDIR=$$PWD/out
+  target = install
+
+build clean: rm
+  rm = *.tgz out build dev
+
+build distclean: rm clean
+  rm = ${PACKAGE}-${VERSION}
