@@ -1,0 +1,7 @@
+include ../common/rules.ninja
+
+build clean: rm
+  rm = *.tgz out build dev
+
+build distclean: rm clean
+  rm = ${PACKAGE}-${VERSION}

@@ -1,4 +1,4 @@
-include ../common/rules.ninja
+include ../common/base.ninja
 
 build ${PACKAGE}-${VERSION}/configure: download
 
@@ -10,9 +10,3 @@ build out: make build/Makefile
   description = Building ${PACKAGE}
   prefix = DESTDIR=$$PWD/out
   target = install
-
-build clean: rm
-  rm = *.tgz out build dev
-
-build distclean: rm clean
-  rm = ${PACKAGE}-${VERSION}

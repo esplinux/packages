@@ -1,0 +1,16 @@
+PACKAGE=toybox
+VERSION=HEAD
+URL=https://github.com/landley/toybox
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}/Makefile: clone
+
+build out: make ${PACKAGE}-${VERSION}/Makefile
+  nproc = 1
+  prefix = PREFIX=../out/bin
+  target = defconfig toybox install_flat
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

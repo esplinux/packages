@@ -20,7 +20,7 @@ rule download
 
 rule clone
   description = Cloning $destination
-  command = git clone -q --depth=1 $url $destination; $
+  command = git clone -q --depth=1 $URL ${PACKAGE}-${VERSION}; $
     if [ -f '${PACKAGE}-${VERSION}.patch' ]; then $
       patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
     fi
