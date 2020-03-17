@@ -12,34 +12,35 @@ curlflags = --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S
 ##############################################################################
 
 rule download
-  description = Downloading $URL
+  description = Downloading ${PACKAGE}
   command = curl $curlflags $URL| tar $tarflags; $
     if [ -f '${PACKAGE}-${VERSION}.patch' ]; then $
       patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
     fi
 
 rule clone
-  description = Cloning $destination
+  description = Cloning ${PACKAGE}
   command = git clone -q --depth=1 $URL ${PACKAGE}-${VERSION}; $
     if [ -f '${PACKAGE}-${VERSION}.patch' ]; then $
       patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
     fi
 
 rule package
-  description = Packaging $out
+  description = Packaging ${PACKAGE}
   command = cd $in; tar -czf ../$out .; cd ..
 
 rule configure
+  description = Configuring ${PACKAGE}
   command = mkdir -p $$(dirname $out); $
     cd $$(dirname $out); $
     $prefix ../$in $opts
 
 rule make
-  description = Building $out
+  description = Building ${PACKAGE}
   command = $prefix make -j$nproc -C $$(dirname $in) $target
 
 rule cmake
-  description = CMAKE $in
+  description = Building ${PACKAGE}
   command = $prefix cmake -B$$(dirname $out) -S$$(dirname $in) $opts
 
 rule mkdir
