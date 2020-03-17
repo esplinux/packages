@@ -6,17 +6,24 @@
 # Defaults inherited by included build files
 ##############################################################################
 tarflags = xz
+curlflags = --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S
 
 # Default build rules
 ##############################################################################
 
 rule download
   description = Downloading $URL
-  command = curl --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S $URL| tar $tarflags
+  command = curl $curlflags $URL| tar $tarflags; $
+    if [ -f '${PACKAGE}-${VERSION}.patch' ]; then $
+      patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
+    fi
 
-rule git
+rule clone
   description = Cloning $destination
-  command = git clone -q --depth=1 $url $destination
+  command = git clone -q --depth=1 $url $destination; $
+    if [ -f '${PACKAGE}-${VERSION}.patch' ]; then $
+      patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
+    fi
 
 rule package
   description = Packaging $out
