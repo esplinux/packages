@@ -4,7 +4,6 @@ build ${PACKAGE}-${VERSION}/configure: download
 
 build build/Makefile: configure ${PACKAGE}-${VERSION}/configure
   description = Configuring ${PACKAGE}
-  prefix = CFLAGS='-O3 -march=broadwell -mtune=broadwell' LDFLAGS='-s -w'
   opts = --prefix=''
 
 build out: make build/Makefile
