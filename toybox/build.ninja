@@ -6,11 +6,23 @@ include ../common/base.ninja
 
 build ${PACKAGE}-${VERSION}/Makefile: clone
 
-build out: make ${PACKAGE}-${VERSION}/Makefile
+build out/bin/toybox: make ${PACKAGE}-${VERSION}/Makefile
   nproc = 1
   prefix = PREFIX=../out/bin
-  target = defconfig toybox install_flat xzcat gzip
+  target = defconfig toybox install_flat
 
-build ${PACKAGE}-${VERSION}.tgz: package out
+build out/bin/xzcat: make ${PACKAGE}-${VERSION}/Makefile | out/bin/toybox
+  nproc = 1
+  prefix = PREFIX=../out/bin
+  target = xzcat
+
+build out/bin/gzip: make ${PACKAGE}-${VERSION}/Makefile | out/bin/xzcat
+  nproc = 1
+  prefix = PREFIX=../out/bin
+  target = gzip
+
+build out: phony out/bin/toybox
+
+build ${PACKAGE}-${VERSION}.tgz: package out | out/bin/xzcat out/bin/gzip
 
 default ${PACKAGE}-${VERSION}.tgz
