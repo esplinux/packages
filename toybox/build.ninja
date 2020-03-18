@@ -9,7 +9,7 @@ build ${PACKAGE}-${VERSION}/Makefile: clone
 build out: make ${PACKAGE}-${VERSION}/Makefile
   nproc = 1
   prefix = PREFIX=../out/bin
-  target = defconfig toybox install_flat
+  target = defconfig toybox install_flat xzcat gzip
 
 build ${PACKAGE}-${VERSION}.tgz: package out
 
