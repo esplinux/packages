@@ -1,7 +1,13 @@
 #!/bin/sh -eu
 
-ninja -C musl
-LDFLAGS=-static ninja -C dash $@
-LDFLAGS=-static ninja -C toybox $@
-LDFLAGS=-static ninja -C make $@
-LDFLAGS=-static ninja -C byacc $@
+if ! type "samu" > /dev/null; then
+  SAMU='ninja'
+else
+  SAMU='samu'
+fi
+
+$SAMU -C musl "$@"
+LDFLAGS=-static "$SAMU" -C dash "$@"
+LDFLAGS=-static "$SAMU" -C toybox "$@"
+LDFLAGS=-static "$SAMU" -C make "$@"
+LDFLAGS=-static "$SAMU" -C byacc "$@"
