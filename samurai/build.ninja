@@ -1,0 +1,16 @@
+PACKAGE=samurai
+VERSION=HEAD
+URL=https://github.com/michaelforney/samurai
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}/Makefile: clone
+
+build out: make ${PACKAGE}-${VERSION}/Makefile
+  description = Building $samuari
+  prefix = DESTDIR=../out
+  target = PREFIX='' install
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

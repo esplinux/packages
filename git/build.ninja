@@ -1,0 +1,19 @@
+PACKAGE=git
+VERSION=2.25.1
+URL=https://mirrors.kernel.org/pub/software/scm/git/${PACKAGE}-${VERSION}.tar.gz
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}/configure ${PACKAGE}-${VERSION}/Makefile: download
+build ${PACKAGE}-${VERSION}/config.mak.autogen: configure ${PACKAGE}-${VERSION}/configure
+  opts = --prefix=''
+
+build config.mak.autogen: phony ${PACKAGE}-${VERSION}/config.mak.autogen
+
+build out: make ${PACKAGE}-${VERSION}/Makefile | config.mak.autogen
+  prefix = DESTDIR=../out
+  target = NO_GETTEXT=1 NO_PERL=1 NO_TCLTK=1 install
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default${PACKAGE}-${VERSION}.tgz

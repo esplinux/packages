@@ -28,11 +28,12 @@ rule clone
 
 rule dev
   command = mkdir -p dev/lib; $
-    mv out/lib/*.a dev/lib; $
+    find out/lib -name *.a -exec mv {} dev/lib \; ; $
     find out/lib -name *.o -exec mv {} dev/lib \; ; $
+    find out/lib -name *.la -exec mv {} dev/lib \; ; $
     test -d out/include && mv out/include dev/include; $
     test -d out/lib/pkgconfig && mv out/lib/pkgconfig dev/lib; $
-    find out/lib -name *.o -exec mv {} dev/lib \;
+    test $$(ls -A out/lib) || rmdir out/lib; $
 
 rule package
   description = Packaging ${PACKAGE} $out
@@ -42,15 +43,15 @@ rule configure
   description = Configuring ${PACKAGE}
   command = mkdir -p $$(dirname $out); $
     cd $$(dirname $out); $
-    $prefix ../$in $opts
+    $prefix ../$in $opts $$CONFIGURE_OPTS
 
 rule make
   description = Building ${PACKAGE}
-  command = $prefix make -j$nproc -C $$(dirname $in) $target
+  command = $prefix make -j$nproc -C $$(dirname $in) $target $$MAKE_OPTS
 
 rule cmake
   description = Building ${PACKAGE}
-  command = $prefix cmake -B$$(dirname $out) -S$$(dirname $in) $opts
+  command = $prefix cmake -B$$(dirname $out) -S$$(dirname $in) $opts $$CMAKE_OPTS
 
 rule mkdir
   command = mkdir $out
