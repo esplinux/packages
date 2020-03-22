@@ -1,0 +1,5 @@
+PACKAGE=Python
+VERSION=3.8.2
+URL=https://www.python.org/ftp/python/${VERSION}/${PACKAGE}-${VERSION}.tgz
+
+include ../common/autoconf-lib.ninja

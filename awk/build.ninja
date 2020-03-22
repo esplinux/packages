@@ -1,0 +1,19 @@
+PACKAGE=awk
+VERSION=HEAD
+URL=https://github.com/onetrueawk/awk
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}/makefile: clone
+
+build ${PACKAGE}-${VERSION}/a.out: make ${PACKAGE}-${VERSION}/makefile
+  prefix = PREFIX=../out/bin
+  target = YACC='yacc -d'
+
+build out/bin/awk: cp ${PACKAGE}-${VERSION}/a.out
+
+build out: phony out/bin/awk
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

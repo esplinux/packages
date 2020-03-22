@@ -4,9 +4,9 @@ build ${PACKAGE}-${VERSION}/configure: download
 
 build build/Makefile: configure ${PACKAGE}-${VERSION}/configure
   description = Configuring ${PACKAGE}
-  opts = --prefix=''
+  opts = --prefix='' ${OPTS}
 
 build out: make build/Makefile
   description = Building ${PACKAGE}
   prefix = DESTDIR=$$PWD/out
-  target = install
+  target = DESTDIR=$$PWD/out install

@@ -1,0 +1,6 @@
+PACKAGE=curl
+VERSION=7.69.0
+URL=https://curl.haxx.se/download/${PACKAGE}-${VERSION}.tar.gz
+OPTS=-with-bearssl
+
+include ../common/autoconf-lib.ninja

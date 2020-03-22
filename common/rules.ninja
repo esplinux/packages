@@ -7,6 +7,7 @@
 ##############################################################################
 tarflags = xz
 curlflags = --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S
+nproc = $$(nproc)
 
 # Default build rules
 ##############################################################################
@@ -25,8 +26,16 @@ rule clone
       patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
     fi
 
+rule dev
+  command = mkdir -p dev/lib; $
+    mv out/lib/*.a dev/lib; $
+    find out/lib -name *.o -exec mv {} dev/lib \; ; $
+    test -d out/include && mv out/include dev/include; $
+    test -d out/lib/pkgconfig && mv out/lib/pkgconfig dev/lib; $
+    find out/lib -name *.o -exec mv {} dev/lib \;
+
 rule package
-  description = Packaging ${PACKAGE}
+  description = Packaging ${PACKAGE} $out
   command = cd $in; tar -czf ../$out .; cd ..
 
 rule configure

@@ -1,0 +1,17 @@
+PACKAGE=netbsd-curses
+VERSION=HEAD
+URL=https://github.com/sabotage-linux/netbsd-curses
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}/GNUmakefile: clone
+
+build out: make ${PACKAGE}-${VERSION}/GNUmakefile
+  target = PREFIX='' DESTDIR=../out install
+
+build dev: dev out
+
+build ${PACKAGE}-${VERSION}.tgz: package out | dev
+build ${PACKAGE}-dev-${VERSION}.tgz: package dev
+
+default ${PACKAGE}-${VERSION}.tgz ${PACKAGE}-dev-${VERSION}.tgz

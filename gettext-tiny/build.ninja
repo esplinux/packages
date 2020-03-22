@@ -1,0 +1,15 @@
+PACKAGE=gettext-tiny
+VERSION=HEAD
+URL=https://github.com/sabotage-linux/gettext-tiny
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}/Makefile: clone
+
+build out: make ${PACKAGE}-${VERSION}/Makefile
+  prefix = DESTDIR=../out
+  target = LIBINTL=NONE prefix='' install
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

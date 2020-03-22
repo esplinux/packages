@@ -1,0 +1,5 @@
+PACKAGE=zlib
+VERSION=1.2.11
+URL=https://www.zlib.net/${PACKAGE}-${VERSION}.tar.gz
+
+include ../common/autoconf-lib.ninja

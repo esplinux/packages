@@ -1,14 +1,8 @@
 include ../common/autoconf-common.ninja
 
-rule dev
-  command = mkdir -p dev/lib; $
-    mv out/include dev/include; $
-    mv out/lib/*.a dev/lib; $
-    mv out/lib/*.o dev/lib
-
 build dev: dev out
 
 build ${PACKAGE}-${VERSION}.tgz: package out | dev
-build ${PACKAGE}-${VERSION}-dev.tgz: package dev
+build ${PACKAGE}-dev-${VERSION}.tgz: package dev
 
-default ${PACKAGE}-${VERSION}.tgz ${PACKAGE}-${VERSION}-dev.tgz
+default ${PACKAGE}-${VERSION}.tgz ${PACKAGE}-dev-${VERSION}.tgz
