@@ -32,7 +32,7 @@ samu -C python "$@"
 #These have non Musl dependencies so we statically link them when bootstrapping
 ###############################################################################
 
-CONFIGURE_OPTS='--diable-shared' MAKE_OPTS='curl_LDFLAGS=-all-static' samu -C curl "$@"
+CONFIGURE_OPTS='--disable-shared' MAKE_OPTS='curl_LDFLAGS=-all-static' samu -C curl "$@"
 LDFLAGS="$LDFLAGS -static" samu -C less "$@"
 LDFLAGS="$LDFLAGS -static" samu -C git "$@"
 LDFLAGS="$LDFLAGS -static" samu -C cmake "$@"

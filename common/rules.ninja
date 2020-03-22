@@ -33,7 +33,7 @@ rule dev
     find out/lib -name *.la -exec mv {} dev/lib \; ; $
     test -d out/include && mv out/include dev/include; $
     test -d out/lib/pkgconfig && mv out/lib/pkgconfig dev/lib; $
-    test $$(ls -A out/lib) || rmdir out/lib; $
+    test "$$(ls -A out/lib)" || rmdir out/lib; $
 
 rule package
   description = Packaging ${PACKAGE} $out
