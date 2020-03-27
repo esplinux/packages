@@ -12,6 +12,10 @@ nproc = $$(nproc)
 # Default build rules
 ##############################################################################
 
+rule curl
+  command = mkdir -p $$(dirname $out); $
+    curl $curlflags $URL -o $out
+
 rule download
   description = Downloading ${PACKAGE}
   command = curl $curlflags $URL| tar $tarflags; $
@@ -39,19 +43,20 @@ rule package
   description = Packaging ${PACKAGE} $out
   command = cd $in; tar -czf ../$out .; cd ..
 
+# CONFIGURE_OPTS is a hack until we sort out bootstrapping static builds better
 rule configure
   description = Configuring ${PACKAGE}
-  command = mkdir -p $$(dirname $out); $
-    cd $$(dirname $out); $
-    $prefix ../$in $opts $$CONFIGURE_OPTS
+  command = mkdir -p $out; cd $out; $prefix ../$in $opts $$CONFIGURE_OPTS
 
+# MAKE_OPTS is a hack until we sort out bootstrapping static builds better
 rule make
   description = Building ${PACKAGE}
-  command = $prefix make -j$nproc -C $$(dirname $in) $target $$MAKE_OPTS
+  command = $prefix make -j$nproc -C $in $target $$MAKE_OPTS
 
+# CMAKEE_OPTS is a hack until we sort out bootstrapping static builds better
 rule cmake
   description = Building ${PACKAGE}
-  command = $prefix cmake -B$$(dirname $out) -S$$(dirname $in) $opts $$CMAKE_OPTS
+  command = $prefix cmake -B$out -S$in $opts $$CMAKE_OPTS
 
 rule mkdir
   command = mkdir $out

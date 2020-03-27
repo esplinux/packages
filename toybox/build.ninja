@@ -4,25 +4,13 @@ URL=https://github.com/landley/toybox
 
 include ../common/base.ninja
 
-build ${PACKAGE}-${VERSION}/Makefile: clone
+build ${PACKAGE}-${VERSION}: clone
 
-build out/bin/toybox: make ${PACKAGE}-${VERSION}/Makefile
+build out: make ${PACKAGE}-${VERSION}
   nproc = 1
   prefix = PREFIX=../out/bin
   target = defconfig toybox install_flat
 
-build out/bin/xzcat: make ${PACKAGE}-${VERSION}/Makefile | out/bin/toybox
-  nproc = 1
-  prefix = PREFIX=../out/bin
-  target = xzcat
-
-build out/bin/gzip: make ${PACKAGE}-${VERSION}/Makefile | out/bin/xzcat
-  nproc = 1
-  prefix = PREFIX=../out/bin
-  target = gzip
-
-build out: phony out/bin/toybox
-
-build ${PACKAGE}-${VERSION}.tgz: package out | out/bin/xzcat out/bin/gzip
+build ${PACKAGE}-${VERSION}.tgz: package out
 
 default ${PACKAGE}-${VERSION}.tgz

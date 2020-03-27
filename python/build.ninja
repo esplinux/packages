@@ -1,5 +1,6 @@
 PACKAGE=Python
 VERSION=3.8.2
 URL=https://www.python.org/ftp/python/${VERSION}/${PACKAGE}-${VERSION}.tgz
+OPTS=--without-ensurepip
 
-include ../common/autoconf-lib.ninja
+include ../common/autoconf.ninja

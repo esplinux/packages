@@ -4,9 +4,9 @@ URL=https://github.com/michaelforney/samurai
 
 include ../common/base.ninja
 
-build ${PACKAGE}-${VERSION}/Makefile: clone
+build ${PACKAGE}-${VERSION}: clone
 
-build out: make ${PACKAGE}-${VERSION}/Makefile
+build out: make ${PACKAGE}-${VERSION}
   description = Building $samuari
   prefix = DESTDIR=../out
   target = PREFIX='' install

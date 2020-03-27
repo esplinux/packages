@@ -1,0 +1,22 @@
+--- a/toybox-HEAD/toys/lsb/gzip.c
++++ b/toybox-HEAD/toys/lsb/gzip.c
+@@ -14,7 +14,7 @@
+ 
+ config GZIP
+   bool "gzip"
+-  default n
++  default y
+   help
+     usage: gzip [-19cdfk] [FILE...]
+ 
+--- a/toybox-HEAD/toys/pending/xzcat.c
++++ b/toybox-HEAD/toys/pending/xzcat.c
+@@ -10,7 +10,7 @@
+ 
+ config XZCAT
+   bool "xzcat"
+-  default n
++  default y
+   help
+     usage: xzcat [filename...]
+     

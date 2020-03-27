@@ -1,0 +1,13 @@
+PACKAGE=ca-certificates
+VERSION=NONE
+URL=https://curl.haxx.se/ca/cacert.pem
+
+include ../common/base.ninja
+
+build out/etc/sll/certs/ca-certificates.crt: curl
+
+build out: phony out/etc/sll/certs/ca-certificates.crt
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

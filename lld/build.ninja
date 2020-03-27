@@ -1,0 +1,31 @@
+PACKAGE=lld
+VERSION=10
+URL=--branch release/10.x https://github.com/llvm/llvm-project
+
+include ../common/base.ninja
+
+#rule lld_ln
+#  command = cd $$(dirname $out); ln -s ld.lld $$(basename $out)
+
+build ${PACKAGE}-${VERSION}: clone
+
+build ${PACKAGE}-${VERSION}/llvm: phony ${PACKAGE}-${VERSION}
+
+#    -DCMAKE_EXE_LINKER_FLAGS=$$LDFLAGS $
+build build: cmake ${PACKAGE}-${VERSION}/llvm
+  opts = -DCMAKE_INSTALL_PREFIX='' $
+    -DCMAKE_BUILD_TYPE=MinSizeRel $
+    -DCMAKE_ASM_COMPILER=clang $
+    -DCMAKE_C_COMPILER=clang $
+    -DCMAKE_CXX_COMPILER=clang++ $
+    -DLLVM_ENABLE_PROJECTS='lld'
+
+build out: make build
+  prefix = DESTDIR=$$PWD/out
+  target = install-lld-stripped
+
+#build $sysroot/bin/ld: lld_ln $sysroot/bin/ld.lld
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz

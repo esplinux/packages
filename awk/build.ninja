@@ -5,8 +5,9 @@ URL=https://github.com/onetrueawk/awk
 include ../common/base.ninja
 
 build ${PACKAGE}-${VERSION}/makefile: clone
+build ${PACKAGE}-${VERSION}: phony ${PACKAGE}-${VERSION}/makefile
 
-build ${PACKAGE}-${VERSION}/a.out: make ${PACKAGE}-${VERSION}/makefile
+build ${PACKAGE}-${VERSION}/a.out: make ${PACKAGE}-${VERSION}
   prefix = PREFIX=../out/bin
   target = YACC='yacc -d'
 
