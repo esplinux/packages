@@ -1,0 +1,25 @@
+PACKAGE=lld
+VERSION=10
+URL=--branch release/10.x https://github.com/llvm/llvm-project
+
+include ../common/base.ninja
+
+build ${PACKAGE}-${VERSION}: clone
+
+build ${PACKAGE}-${VERSION}/llvm: phony ${PACKAGE}-${VERSION}
+
+build build: cmake ${PACKAGE}-${VERSION}/llvm
+  opts = -DCMAKE_INSTALL_PREFIX='' $
+    -DCMAKE_BUILD_TYPE=MinSizeRel $
+    -DCMAKE_ASM_COMPILER=clang $
+    -DCMAKE_C_COMPILER=clang $
+    -DCMAKE_CXX_COMPILER=clang++ $
+    -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON
+
+build out: make build
+  prefix = DESTDIR=$$PWD/out
+  target = install
+
+build ${PACKAGE}-${VERSION}.tgz: package out
+
+default ${PACKAGE}-${VERSION}.tgz
