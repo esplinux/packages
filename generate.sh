@@ -50,7 +50,7 @@ done < "$input"
   printf 'VERSION=%s\n' "$VERSION";
   printf '\n';
 
-  printf 'all: out\n';
+  printf 'all: ${PACKAGE}-${VERSION}.tar.gz\n';
   printf '\n';
 
   if [ -n "$URL" ]
@@ -90,6 +90,9 @@ done < "$input"
     ;;
   esac
 
+  printf '${PACKAGE}-${VERSION}.tar.gz: out\n';
+  printf '\tcd out; tar -czf ../${PACKAGE}-${VERSION}.tar.gz .\n';
+  printf '\n';
   printf 'clean:\n';
   printf '\trm -rf build out\n';
   printf '\n';
