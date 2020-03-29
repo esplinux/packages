@@ -1,7 +1,11 @@
 include ../common/rules.ninja
 
+SRC = $$( [ -z '$SRC' ] && printf %s ${PACKAGE}-${VERSION} || printf %s '$SRC' )
+
 build clean: rm
+  description = Cleaning ${PACKAGE} targets
   rm = *.tgz out build dev
 
 build distclean: rm clean
-  rm = ${PACKAGE}-${VERSION}
+  description = Cleaning ${PACKAGE} source
+  rm = $SRC

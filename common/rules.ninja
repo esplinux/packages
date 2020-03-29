@@ -5,20 +5,28 @@
 
 # Defaults inherited by included build files
 ##############################################################################
-tarflags = xz
-curlflags = --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S
-nproc = $$(nproc)
+TARFLAGS = $$( [ -z '$TARFLAGS' ] && printf 'xz' || printf %s '$TARFLAGS' )
+NPROC = $$( [ -z '$NPROC' ] && nproc || printf %s '$NPROC' )
+
+# Constants for rules
+##############################################################################
+CURL_FLAGS = --connect-timeout 3 --retry 3 --retry-delay 1 -L -s -S
 
 # Default build rules
 ##############################################################################
 
+rule gobuild
+  command = mkdir -p $out/bin; $
+    cd $$(dirname $in); go build $$(basename $in); $
+    cp $$(basename $in | sed 's/.go$$//') ../$out/bin
+
 rule curl
   command = mkdir -p $$(dirname $out); $
-    curl $curlflags $URL -o $out
+    curl $CURL_FLAGS $URL -o $out
 
 rule download
   description = Downloading ${PACKAGE}
-  command = curl $curlflags $URL| tar $tarflags; $
+  command = curl $CURL_FLAGS $URL| tar $TARFLAGS; $
     if [ -f '${PACKAGE}-${VERSION}.patch' ]; then $
       patch -p1 -i '${PACKAGE}-${VERSION}.patch'; $
     fi
@@ -51,7 +59,7 @@ rule configure
 # MAKE_OPTS is a hack until we sort out bootstrapping static builds better
 rule make
   description = Building ${PACKAGE}
-  command = $prefix make -j$nproc -C $in $target $$MAKE_OPTS
+  command = $prefix make -j$NPROC -C $in $target $$MAKE_OPTS
 
 # CMAKEE_OPTS is a hack until we sort out bootstrapping static builds better
 rule cmake

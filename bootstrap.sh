@@ -1,9 +1,9 @@
-#!/bin/sh -eu
-
-SAMU=samu
+#!/bin/sh -e
 
 if ! type "samu" > /dev/null; then
   SAMU=ninja
+else
+  SAMU=samu
 fi 
 
 # Compiler Flags
@@ -13,8 +13,7 @@ export CXX=clang++
 
 export CFLAGS='-Oz -march=broadwell -fno-asynchronous-unwind-tables -fno-strict-aliasing'
 export CXXFLAGS='-Oz -march=broadwell'
-export LDFLAGS='-fuse-ld=lld -w -s'
-
+export LDFLAGS='-rtlib=compiler-rt -fuse-ld=lld -z noexecstack -z relro -z now -w -s'
 
 # Bootstrap Libraries
 #####################
@@ -34,20 +33,27 @@ $SAMU -C awk "$@"
 $SAMU -C samurai "$@"
 $SAMU -C make "$@"
 #$SAMU -C python "$@"
+$SAMU -C espbuild "$@"
 
 
 #These have non Musl dependencies so we statically link them when bootstrapping
 ###############################################################################
-CONFIGURE_OPTS='--disable-shared' MAKE_OPTS='curl_LDFLAGS=-all-static' $SAMU -C curl "$@"
+#CONFIGURE_OPTS='--disable-shared' MAKE_OPTS='curl_LDFLAGS=-all-static' $SAMU -C curl "$@"
 
-LDFLAGS="$LDFLAGS -static" $SAMU -C lld "$@"
-LDFLAGS="$LDFLAGS -static" $SAMU -C clang "$@"
+LDFLAGS="-fuse-ld=lld -z noexecstack -z relro -z now -w -s -static" $SAMU -C lld "$@"
+LDFLAGS="-fuse-ld=lld -z noexecstack -z relro -z now -w -s -static" $SAMU -C clang "$@"
 #LDFLAGS="$LDFLAGS -static" $SAMU -C llvm "$@"
 
 #LDFLAGS="$LDFLAGS -static" $SAMU -C less "$@"
-LDFLAGS="$LDFLAGS -static" $SAMU -C git "$@"
+#LDFLAGS="$LDFLAGS -static" $SAMU -C git "$@"
 #LDFLAGS="$LDFLAGS -static" $SAMU -C cmake "$@"
 
-mkdir -p sysroot
-find . -maxdepth 2 -name *.tgz | xargs -n 1 tar -xC sysroot -f
-tar -cC sysroot -zf sysroot.tgz .
+if [ -z $1 ]
+then
+  rm -rf sysroot
+  mkdir sysroot
+  find . -maxdepth 2 -name *.tgz | xargs -n 1 tar -xC sysroot -f
+  cd sysroot/bin; ln -sf dash sh; cd ../..
+  tar -cC sysroot -zf sysroot.tgz .
+fi
+

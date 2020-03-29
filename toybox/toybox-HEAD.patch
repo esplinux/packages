@@ -19,4 +19,15 @@
 +  default y
    help
      usage: xzcat [filename...]
-     
+
+--- a/toybox-HEAD/toys/pending/vi.c
++++ b/toybox-HEAD/toys/pending/vi.c
+@@ -9,7 +9,7 @@
+ 
+ config VI
+   bool "vi"
+-  default n
++  default y
+   help
+     usage: vi [-s script] FILE
+     -s script: run script file

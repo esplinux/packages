@@ -1,5 +1,5 @@
 PACKAGE=cmake
-VERSION=3.16.5
+VERSION=3.17.0
 URL=https://github.com/Kitware/CMake/releases/download/v${VERSION}/${PACKAGE}-${VERSION}.tar.gz
 
 include ../common/base.ninja

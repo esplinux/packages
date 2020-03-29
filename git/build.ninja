@@ -1,16 +1,17 @@
 PACKAGE=git
-VERSION=2.25.1
+VERSION=2.26.0
 URL=https://mirrors.kernel.org/pub/software/scm/git/${PACKAGE}-${VERSION}.tar.gz
 
 include ../common/base.ninja
 
 build ${PACKAGE}-${VERSION}/configure: download
 build ${PACKAGE}-${VERSION}: configure ${PACKAGE}-${VERSION}/configure
-  opts = --prefix=''
+  opts = --prefix='' --with-curl --without-tcltk
 
+#  target = NO_GETTEXT=1 NO_PERL=1 NO_TCLTK=1 install
 build out: make ${PACKAGE}-${VERSION}
   prefix = DESTDIR=../out
-  target = NO_GETTEXT=1 NO_PERL=1 NO_TCLTK=1 install
+  target = install
 
 build ${PACKAGE}-${VERSION}.tgz: package out
 
