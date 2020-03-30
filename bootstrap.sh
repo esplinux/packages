@@ -52,7 +52,7 @@ if [ -z $1 ]
 then
   rm -rf sysroot
   mkdir sysroot
-  find . -maxdepth 2 -name *.tgz | xargs -n 1 tar -xC sysroot -f
+  find . -maxdepth 2 -name '*.tgz' | xargs -n 1 tar -xC sysroot -f
   cd sysroot/bin; ln -sf dash sh; cd ../..
   tar -cC sysroot -zf sysroot.tgz .
 fi
