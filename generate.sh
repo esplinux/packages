@@ -91,7 +91,7 @@ generate() {
       ;;
     esac
   
-    printf '${PACKAGE}-${VERSION}.tar.gz: out\n';
+    printf '$(PACKAGE)-$(VERSION).tar.gz: out\n';
     printf '\tcd out; tar -czf ../$(PACKAGE)-$(VERSION).tgz .\n';
     printf '\n';
     printf 'clean:\n';
