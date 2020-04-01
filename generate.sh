@@ -1,29 +1,35 @@
 #!/bin/sh -eu
 
-PACKAGE=""
-VERSION=""
-PATCH=""
-URL=""
-GIT=""
-TEMPLATE="automake"
-TARGET=""
-INSTALL_TARGET="DESTDIR=$PWD/out install"
-
-AUTOMAKE_OPTIONS="--prefix=''"
-
-CMAKE_OPTIONS=""
-
 error() {
   printf "ERROR: %s\n" "$1"
   exit 1
 }
 
+substitute() {
+  RESULT=$1
+  RESULT=$( printf '%s' "$RESULT" | sed s/\$PACKAGE/"$PACKAGE"/ )
+  RESULT=$( printf '%s' "$RESULT" | sed s/\$VERSION/"$VERSION"/ )
+  printf '%s' "$RESULT"
+}
+
 generate() {
-  input="$1"
+  INPUT="$1"
+
+  PACKAGE=""
+  VERSION=""
+  PATCH=""
+  URL=""
+  GIT=""
+  TEMPLATE="automake"
+  TARGET=""
+  INSTALL_TARGET="DESTDIR=$PWD/out install"
+  AUTOMAKE_OPTIONS="--prefix=''"
+  CMAKE_OPTIONS=""
+
   while IFS='=' read -r lhs rhs
   do
-    KEY=$(printf %s "$lhs" | awk '{$1=$1};1')
-    VALUE=$(printf %s "$rhs" | awk '{$1=$1};1')
+    KEY=$( printf %s "$lhs" | awk '{$1=$1};1' )
+    VALUE=$( printf %s "$rhs" | awk '{$1=$1};1' )
   
     case $KEY in
       "#"*) ;; # Skip comments
@@ -40,18 +46,21 @@ generate() {
       'CMAKE_OPTIONS') CMAKE_OPTIONS=$VALUE ;;
       *) error "Unkown key $KEY" ;;
     esac
-  done < "$input"
+  done < "$INPUT"
   
   [ -z "$PACKAGE" ] && error "PACKAGE missing"
   [ -z "$VERSION" ] && error "VERSION missing"
-  
+
+  # These values are interpolated
+  PATCH=$( substitute "$PATCH" )
+  URL=$( substitute "$URL" )
+  GIT=$( substitute "$GIT" )
+
   { 
     printf '.POSIX:\n';
-    printf 'PACKAGE=%s\n' "$PACKAGE";
-    printf 'VERSION=%s\n' "$VERSION";
+    printf 'all: %s\n' "$PACKAGE";
     printf '\n';
-  
-    printf 'all: $(PACKAGE)-$(VERSION).tar.gz\n';
+    printf '%s: %s-%s.tar.gz\n' "$PACKAGE" "$PACKAGE" "$VERSION";
     printf '\n';
   
     if [ -n "$URL" ]
@@ -59,9 +68,9 @@ generate() {
       FILENAME="${URL##*/}";
       printf 'src:\n';
       printf '\tcurl -sSLO %s\n' "$URL";
-      printf '\ttar xf %s\n' $FILENAME;
-      printf '\trm %s\n' $FILENAME;
-      printf '\tmv $(PACKAGE)-$(VERSION) src\n';
+      printf '\ttar xf %s\n' "$FILENAME";
+      printf '\trm %s\n' "$FILENAME";
+      printf '\tmv %s-%s src\n' "$PACKAGE" "$VERSION";
       [ -z "$PATCH" ] || printf '\tpatch -p1 -i %s\n' "$PATCH";
       printf '\n';
     fi
@@ -77,29 +86,29 @@ generate() {
     case $TEMPLATE in
       "cmake")
         printf "out: src\n";
-        printf "\tcmake -S src -B build $CMAKE_OPTIONS\n";
-        printf "\tmake -C build $TARGET\n";
-        printf "\tmake -C build $INSTALL_TARGET\n";
+        printf "\tcmake -S src -B build %s\n" "$CMAKE_OPTIONS";
+        printf "\tmake -C build %s\n" "$TARGET";
+        printf "\tmake -C build %s\n" "$INSTALL_TARGET";
         printf '\n';
       ;;
       "automake")
         printf "out: src\n";
-        printf "\tcd src; ./configure $AUTOMAKE_OPTIONS\n";
-        printf "\tmake -C src $TARGET\n";
-        printf "\tmake -C src $INSTALL_TARGET\n";
+        printf "\tcd src; ./configure %s\n" "$AUTOMAKE_OPTIONS";
+        printf "\tmake -C src %s\n" "$TARGET";
+        printf "\tmake -C src %s\n" "$INSTALL_TARGET";
         printf '\n';
       ;;
     esac
   
-    printf '$(PACKAGE)-$(VERSION).tar.gz: out\n';
-    printf '\tcd out; tar -czf ../$(PACKAGE)-$(VERSION).tgz .\n';
+    printf '%s-%s.tar.gz: out\n' "$PACKAGE" "$VERSION";
+    printf '\tcd out; tar -czf ../%s-%s.tgz .\n' "$PACKAGE" "$VERSION";
     printf '\n';
     printf 'clean:\n';
-    printf '\trm -rf build out $(PACKAGE)-$(VERSION).tgz\n';
+    printf '\trm -rf build out %s-%s.tgz\n' "$PACKAGE" "$VERSION";
     printf '\n';
     printf 'distclean: clean\n';
     printf '\trm -rf src\n';
   } > Makefile
 }
 
-generate $1
+generate "$1"
