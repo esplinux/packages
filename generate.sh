@@ -1,5 +1,7 @@
 #!/bin/sh -eu
 
+PACKAGES=""
+
 error() {
   printf "ERROR: %s\n" "$1"
   exit 1
@@ -51,15 +53,15 @@ generate() {
   [ -z "$PACKAGE" ] && error "PACKAGE missing"
   [ -z "$VERSION" ] && error "VERSION missing"
 
+  # Add to default target
+  PACKAGES="$PACKAGE $PACKAGES"
+
   # These values are interpolated
   PATCH=$( substitute "$PATCH" )
   URL=$( substitute "$URL" )
   GIT=$( substitute "$GIT" )
 
   { 
-    printf '.POSIX:\n';
-    printf 'all: %s\n' "$PACKAGE";
-    printf '\n';
     printf '%s: %s-%s.tar.gz\n' "$PACKAGE" "$PACKAGE" "$VERSION";
     printf '\n';
   
@@ -108,7 +110,18 @@ generate() {
     printf '\n';
     printf 'distclean: clean\n';
     printf '\trm -rf src\n';
-  } > Makefile
+    printf '\n';
+  } >> .Makefile
 }
 
+{
+  printf '.POSIX:\n';
+  printf 'default: all\n';
+  printf '\n';
+} > .Makefile
+
 generate "$1"
+
+printf 'all: %s\n' "$PACKAGES" >> .Makefile
+
+mv .Makefile Makefile
