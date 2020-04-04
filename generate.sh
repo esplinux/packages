@@ -85,7 +85,7 @@ generate() {
     if [ -n "$URL" ]
     then
       printf '%s:\n' "$SRC";
-      printf '\tcurl -sSL %s | tar -xz\n' "$URL";
+      printf '\tcurl -sSL %s | tar -C %s -xz\n' "$URL" "$BASE";
       [ -z "$PATCH" ] || printf '\tpatch -p1 -i %s\n' "$PATCH";
       printf '\n';
     fi
@@ -116,12 +116,13 @@ generate() {
     esac
   
     printf '%s-%s.tar.gz: %s\n' "$PACKAGE" "$VERSION" "$OUT";
-    printf '\tcd %s; tar -czf ../%s-%s.tgz .\n' "$OUT" "$PACKAGE" "$VERSION";
+    printf '\tcd %s; tar -czf %s/%s-%s.tgz .\n' "$OUT" "$CURDIR" "$PACKAGE" "$VERSION";
     printf '\n';
-    printf 'clean:\n';
+
+    printf '%s-clean:\n' "$PACKAGE";
     printf '\trm -rf %s %s %s-%s.tgz\n' "$BUILD" "$OUT" "$PACKAGE" "$VERSION";
     printf '\n';
-    printf 'distclean: clean\n';
+    printf '%s-distclean: %s-clean\n' "$PACKAGE" "$PACKAGE";
     printf '\trm -rf %s\n' "$SRC";
     printf '\n';
   } >> .Makefile
@@ -133,8 +134,30 @@ generate() {
   printf '\n';
 } > .Makefile
 
-generate "$1"
-
-printf 'all: %s\n' "$PACKAGES" >> .Makefile
+if [ $# -gt 0 ]
+then
+  echo Processing "$1"
+  generate "$1"
+  {
+    printf 'all: %s\n' "$PACKAGE";
+    printf 'clean: %s-clean\n' "$PACKAGE";
+    printf 'distclean: %s-distclean\n' "$PACKAGE";
+  } >> .Makefile
+else
+  find . -name '*.esp' | while read -r ARG
+  do
+    echo Processing "$ARG"
+    generate "$ARG"
+    {
+      printf 'all: %s\n' "$PACKAGES";
+      printf 'clean: ';
+      printf '%s-clean ' $PACKAGES;
+      printf '\n';
+      printf 'distclean: ';
+      printf '%s-distclean ' $PACKAGES;
+      printf '\n';
+    } >> .Makefile
+  done
+fi
 
 mv .Makefile Makefile
