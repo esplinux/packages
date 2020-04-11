@@ -1,0 +1,13 @@
+MUSL = struct(
+  name    = "musl", 
+  version = "1.2.0", 
+  rev     = "0",
+)
+
+SOURCE = source("https://musl.libc.org/releases/musl-%s.tar.gz" % MUSL.version)
+
+OUT = automake(SOURCE)
+LIB = OUT + "/lib"
+INCLUDE = OUT + "/include"
+
+PACKAGE = tarball(OUT, MUSL)

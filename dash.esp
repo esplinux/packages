@@ -1,0 +1,23 @@
+DASH = struct(
+  name    = "dash", 
+  version = "0.5.10", 
+  rev     = "0"
+)
+
+load("musl.esp", MUSL_OUT="OUT")
+
+SOURCE = source("http://gondor.apana.org.au/~herbert/dash/files/dash-%s.tar.gz" % DASH.version)
+
+
+_CFLAGS = "--sysroot=%s --rtlib=compiler-rt -O3" % MUSL_OUT
+CFLAGS = _CFLAGS + " --static" if BOOTSTRAP else _CFLAGS
+
+ENV = {
+  "CC" : "clang",
+  "CFLAGS" : CFLAGS,
+}
+
+OUT = automake(SOURCE, env=ENV)
+shell("cd %s; ln -s dash sh" % (OUT + "/bin"))
+
+PACKAGE = tarball(OUT, DASH)

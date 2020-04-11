@@ -1,0 +1,20 @@
+AWK = struct(
+  name    = "awk", 
+  version = "HEAD", 
+  rev     = "0"
+)
+
+load("musl.esp", MUSL_OUT="OUT")
+
+SOURCE = source(git="https://github.com/onetrueawk/awk")
+
+_CFLAGS = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL_OUT 
+CFLAGS = _CFLAGS + " --static" if BOOTSTRAP else _CFLAGS
+TARGET = "CC=clang HOSTCC=clang YACC='yacc -d' CFLAGS='%s'" % CFLAGS
+make(SOURCE, "-j %s %s" % (NPROC,TARGET))
+
+OUT = path(AWK.name + "-out")
+shell("mkdir -p %s/bin" % OUT)
+shell("cp %s/a.out %s/bin/awk" % (SOURCE,OUT))
+
+PACKAGE = tarball(OUT, AWK)

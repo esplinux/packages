@@ -1,0 +1,19 @@
+TOYBOX = struct(
+  name    = "toybox", 
+  version = "HEAD", 
+  rev     = "0"
+)
+
+load("linux.esp", LINUX_INCLUDE="INCLUDE")
+load("musl.esp", MUSL_OUT="OUT")
+
+SOURCE = source(git="https://github.com/landley/toybox")
+OUT = SOURCE + "-out"
+
+TOOLS = "CC=clang HOSTCC=clang"
+_CFLAGS = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -I%s -O3" % (MUSL_OUT, LINUX_INCLUDE)
+CFLAGS = "CFLAGS='%s --static'" % _CFLAGS if BOOTSTRAP else "CFLAGS='%s'" % _CFLAGS
+TARGET = "PREFIX=%s/bin defconfig toybox install_flat" % OUT
+make(SOURCE, " ".join([TOOLS, CFLAGS, TARGET]))
+
+PACKAGE = tarball(OUT, TOYBOX)

@@ -10,9 +10,9 @@ error() {
 
 substitute() {
   RESULT=$1
-  RESULT=$( printf '%s' "$RESULT" | sed s?\$PACKAGE?"$PACKAGE"? )
-  RESULT=$( printf '%s' "$RESULT" | sed s?\$VERSION?"$VERSION"? )
-  RESULT=$( printf '%s' "$RESULT" | sed s?\$OUT?"$OUT"? )
+  RESULT=$( printf '%s' "$RESULT" | sed s?\$PACKAGE?"$PACKAGE"?g )
+  RESULT=$( printf '%s' "$RESULT" | sed s?\$VERSION?"$VERSION"?g )
+  RESULT=$( printf '%s' "$RESULT" | sed s?\$OUT?"$OUT"?g )
   printf '%s' "$RESULT"
 }
 
