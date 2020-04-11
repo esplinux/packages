@@ -1,0 +1,21 @@
+BYACC = struct(
+  name    = "byacc", 
+  version = "20200330", 
+  rev     = "0"
+)
+
+load("musl.esp", MUSL_OUT="OUT")
+#https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz
+SOURCE = source("https://invisible-mirror.net/archives/byacc/byacc-%s.tgz" % BYACC.version)
+
+_CFLAGS = "--sysroot=%s --rtlib=compiler-rt -O3" % MUSL_OUT
+CFLAGS = _CFLAGS + " --static" if BOOTSTRAP else _CFLAGS
+
+ENV = {
+  "CC" : "clang",
+  "CFLAGS" : CFLAGS,
+}
+
+OUT = automake(SOURCE, env=ENV)
+
+PACKAGE = tarball(OUT, BYACC)
