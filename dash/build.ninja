@@ -1,5 +1,0 @@
-PACKAGE=dash
-VERSION=0.5.10
-URL=http://gondor.apana.org.au/~herbert/dash/files/${PACKAGE}-${VERSION}.tar.gz
-
-include ../common/autoconf.ninja
