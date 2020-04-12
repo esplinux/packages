@@ -1,0 +1,23 @@
+name    = "curses"
+version = "HEAD" 
+rev     = "0"
+
+source = fetch(git="https://github.com/sabotage-linux/netbsd-curses")
+
+load("musl.esp", "MUSL")
+
+out = source + "-out"
+shell("mkdir %s" % out)
+
+cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL.sysroot
+target = "HOSTCC=clang CC='clang %s' PREFIX='' DESTDIR=%s install" % (cflags, out)
+make(source, "-j %s %s" % (NPROC, target))
+
+CURSES = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev),
+  lib     = out + "/lib",
+  include = out + "/include"
+)

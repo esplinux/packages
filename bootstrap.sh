@@ -2,7 +2,7 @@
 
 ./clean.sh
 
-espbuild -D BOOTSTRAP linux.esp musl.esp dash.esp awk.esp byacc.esp cacert.esp toybox.esp
+espbuild -D BOOTSTRAP linuxHeaders.esp cacert.esp musl.esp curses.esp dash.esp awk.esp byacc.esp toybox.esp
 
 mkdir sysroot
 
