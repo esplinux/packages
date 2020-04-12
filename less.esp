@@ -1,0 +1,25 @@
+name    = "less"
+version = "551" 
+rev     = "0"
+
+source = fetch("http://greenwoodsoftware.com/less/less-%s.tar.gz" % version)
+
+load("musl.esp", "MUSL")
+load("curses.esp", "CURSES")
+
+cflags = "--sysroot=%s --rtlib=compiler-rt -O3 -I%s" % (MUSL.sysroot, CURSES.include)
+ldflags = "-L%s" % CURSES.lib
+bootstrap = "--static" if BOOTSTRAP else ""
+
+out = automake(source, env={
+  "CC"      : "clang",
+  "CFLAGS"  : cflags,
+  "LDFLAGS" : ldflags + " " + bootstrap
+})
+
+LESS = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev)
+)

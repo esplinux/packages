@@ -1,5 +1,0 @@
-PACKAGE=less
-VERSION=551
-URL=http://greenwoodsoftware.com/less/${PACKAGE}-${VERSION}.tar.gz
-
-include ../common/autoconf.ninja
