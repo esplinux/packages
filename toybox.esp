@@ -1,19 +1,23 @@
+name    = "toybox"
+version = "HEAD"
+rev     = "0"
+
+source = fetch(git="https://github.com/landley/toybox")
+
+load("linuxHeaders.esp", "LINUXHEADERS")
+load("musl.esp", "MUSL")
+
+out = source + "-out"
+
+tools = "CC=clang HOSTCC=clang"
+cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -I%s -O3" % (MUSL.sysroot, LINUXHEADERS.include)
+bootstrap = "--static" if BOOTSTRAP else ""
+target = "PREFIX=%s/bin defconfig toybox install_flat" % out
+make(source, "%s CFLAGS='%s %s' %s" % (tools, cflags, bootstrap, target))
+
 TOYBOX = struct(
   name    = "toybox", 
   version = "HEAD", 
-  rev     = "0"
+  rev     = "0",
+  package = tarball(out, name, version, rev)
 )
-
-load("linux.esp", LINUX_INCLUDE="INCLUDE")
-load("musl.esp", MUSL_OUT="OUT")
-
-SOURCE = source(git="https://github.com/landley/toybox")
-OUT = SOURCE + "-out"
-
-TOOLS = "CC=clang HOSTCC=clang"
-_CFLAGS = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -I%s -O3" % (MUSL_OUT, LINUX_INCLUDE)
-CFLAGS = "CFLAGS='%s --static'" % _CFLAGS if BOOTSTRAP else "CFLAGS='%s'" % _CFLAGS
-TARGET = "PREFIX=%s/bin defconfig toybox install_flat" % OUT
-make(SOURCE, " ".join([TOOLS, CFLAGS, TARGET]))
-
-PACKAGE = tarball(OUT, TOYBOX)

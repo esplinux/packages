@@ -1,21 +1,22 @@
-BYACC = struct(
-  name    = "byacc", 
-  version = "20200330", 
-  rev     = "0"
-)
+name    = "byacc"
+version = "20200330" 
+rev     = "0"
 
-load("musl.esp", MUSL_OUT="OUT")
-#https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz
-SOURCE = source("https://invisible-mirror.net/archives/byacc/byacc-%s.tgz" % BYACC.version)
+source = fetch("https://invisible-mirror.net/archives/byacc/byacc-%s.tgz" % version)
 
-_CFLAGS = "--sysroot=%s --rtlib=compiler-rt -O3" % MUSL_OUT
-CFLAGS = _CFLAGS + " --static" if BOOTSTRAP else _CFLAGS
+load("musl.esp", "MUSL")
 
-ENV = {
+cflags = "--sysroot=%s --rtlib=compiler-rt -O3" % MUSL.sysroot
+bootstrap = "--static" if BOOTSTRAP else ""
+
+out = automake(source, env={
   "CC" : "clang",
-  "CFLAGS" : CFLAGS,
-}
+  "CFLAGS" : cflags + " " + bootstrap,
+})
 
-OUT = automake(SOURCE, env=ENV)
-
-PACKAGE = tarball(OUT, BYACC)
+BYACC = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev)
+)

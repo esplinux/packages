@@ -1,13 +1,16 @@
+name    = "musl" 
+version = "1.2.0" 
+rev     = "0"
+
+source = fetch("https://musl.libc.org/releases/musl-%s.tar.gz" % version)
+out = automake(source)
+
 MUSL = struct(
-  name    = "musl", 
-  version = "1.2.0", 
-  rev     = "0",
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev),
+  lib     = out + "/lib",
+  include = out + "/include",
+  sysroot = out
 )
-
-SOURCE = source("https://musl.libc.org/releases/musl-%s.tar.gz" % MUSL.version)
-
-OUT = automake(SOURCE)
-LIB = OUT + "/lib"
-INCLUDE = OUT + "/include"
-
-PACKAGE = tarball(OUT, MUSL)

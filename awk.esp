@@ -1,20 +1,23 @@
+name    = "awk"
+version = "HEAD" 
+rev     = "0"
+
+source = fetch(git="https://github.com/onetrueawk/awk")
+
+load("musl.esp", "MUSL")
+
+cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL.sysroot
+bootstrap = "--static" if BOOTSTRAP else ""
+target = "HOSTCC=clang YACC='yacc -d' CFLAGS='%s %s'" % (cflags, bootstrap)
+make(source, "-j %s %s" % (NPROC, target))
+
+out = path(name + "-out")
+shell("mkdir -p %s/bin" % out)
+shell("cp %s/a.out %s/bin/awk" % (source, out))
+
 AWK = struct(
-  name    = "awk", 
-  version = "HEAD", 
-  rev     = "0"
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev)
 )
-
-load("musl.esp", MUSL_OUT="OUT")
-
-SOURCE = source(git="https://github.com/onetrueawk/awk")
-
-_CFLAGS = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL_OUT 
-CFLAGS = _CFLAGS + " --static" if BOOTSTRAP else _CFLAGS
-TARGET = "CC=clang HOSTCC=clang YACC='yacc -d' CFLAGS='%s'" % CFLAGS
-make(SOURCE, "-j %s %s" % (NPROC,TARGET))
-
-OUT = path(AWK.name + "-out")
-shell("mkdir -p %s/bin" % OUT)
-shell("cp %s/a.out %s/bin/awk" % (SOURCE,OUT))
-
-PACKAGE = tarball(OUT, AWK)
