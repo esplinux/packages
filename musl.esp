@@ -3,7 +3,10 @@ version = "1.2.0"
 rev     = "0"
 
 source = fetch("https://musl.libc.org/releases/musl-%s.tar.gz" % version)
-out = automake(source)
+out = automake(source, env={
+  "CC" : "clang",
+  "AR" : "llvm-ar"
+})
 
 MUSL = struct(
   name    = name, 
