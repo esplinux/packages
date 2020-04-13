@@ -1,5 +1,0 @@
-PACKAGE=make
-VERSION=3.81
-URL=https://ftp.gnu.org/gnu/make/${PACKAGE}-${VERSION}.tar.gz
-
-include ../common/autoconf.ninja

@@ -1,0 +1,24 @@
+name    = "make"
+version = "3.81" 
+rev     = "0"
+
+source = fetch("https://ftp.gnu.org/gnu/make/make-%s.tar.gz" % version)
+
+load("musl.esp", "MUSL")
+
+cflags = "--sysroot=%s -O3" % MUSL.sysroot
+bootstrap = "--static" if BOOTSTRAP else ""
+
+out = automake(source, env={
+  "CC" : "clang",
+  "CFLAGS" : cflags + " " + bootstrap,
+  "LD" : "lld",
+  "LDFLAGS" : "-rtlib=compiler-rt"
+})
+
+MAKE = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev)
+)
