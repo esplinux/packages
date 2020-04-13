@@ -1,0 +1,30 @@
+name    = "curl"
+version = "7.69.1" 
+rev     = "0"
+
+source = fetch("https://curl.haxx.se/download/curl-%s.tar.gz" % version)
+
+load("musl.esp", "MUSL")
+load("zlib.esp", "ZLIB")
+load("bearssl.esp", "BEARSSL")
+
+cflags = "-pipe --sysroot=%s -I%s -I%s" % (MUSL.sysroot, BEARSSL.include, ZLIB.include)
+ldflags = "-rtlib=compiler-rt --sysroot=%s -L%s -L%s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
+bootstrap = "--static" if BOOTSTRAP else ""
+
+
+options = "--prefix='' --with-bearssl --with-zlib --host=none"
+
+out = automake(source, options, target="install-strip", env={
+  "CC" : "clang",
+  "CFLAGS" : cflags + " " + bootstrap,
+  "LD" : "lld",
+  "LDFLAGS" : ldflags + " " + bootstrap
+})
+
+CURL = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev)
+)
