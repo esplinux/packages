@@ -1,0 +1,16 @@
+name    = "linuxHeaders"
+version = "4.19.88"
+rev     = "0"
+
+source = fetch("https://ftp.barfooze.de/pub/sabotage/tarballs/linux-headers-%s.tar.xz" % version)
+
+out = source + "-out"
+make(source, "ARCH=x86_64 prefix='' DESTDIR=%s install" % out)
+
+LINUXHEADERS = struct(
+  name    = "linuxHeaders", 
+  version = "4.19.88", 
+  rev     = "0",
+  package = tarball(out, name, version, rev),
+  include = out + "/include"
+)
