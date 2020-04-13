@@ -6,12 +6,13 @@ source = fetch("http://gondor.apana.org.au/~herbert/dash/files/dash-%s.tar.gz" %
 
 load("musl.esp", "MUSL")
 
-cflags = "--sysroot=%s --rtlib=compiler-rt -O3" % MUSL.sysroot
+cflags = "--sysroot=%s --rtlib=compiler-rt -Os" % MUSL.sysroot
 bootstrap = "--static" if BOOTSTRAP else ""
 
 out = automake(source, env={
   "CC" : "clang",
   "CFLAGS" : cflags + " " + bootstrap,
+  "LDFLAGS" : "-s -w"
 })
 
 shell("cd %s/bin; ln -s dash sh" % out)

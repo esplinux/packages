@@ -10,7 +10,7 @@ load("musl.esp", "MUSL")
 out = source + "-out"
 
 tools = "CC=clang HOSTCC=clang"
-cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -I%s -O3" % (MUSL.sysroot, LINUXHEADERS.include)
+cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -I%s -Os" % (MUSL.sysroot, LINUXHEADERS.include)
 bootstrap = "--static" if BOOTSTRAP else ""
 target = "PREFIX=%s/bin defconfig toybox install_flat" % out
 make(source, "%s CFLAGS='%s %s' %s" % (tools, cflags, bootstrap, target))

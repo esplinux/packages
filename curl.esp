@@ -8,12 +8,12 @@ load("musl.esp", "MUSL")
 load("zlib.esp", "ZLIB")
 load("bearssl.esp", "BEARSSL")
 
-cflags = "-pipe --sysroot=%s -I%s -I%s" % (MUSL.sysroot, BEARSSL.include, ZLIB.include)
-ldflags = "-rtlib=compiler-rt --sysroot=%s -L%s -L%s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
+cflags = "-O3 -pipe --sysroot=%s -I%s -I%s" % (MUSL.sysroot, BEARSSL.include, ZLIB.include)
+ldflags = "-rtlib=compiler-rt --sysroot=%s -L%s -L%s -w -s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
 bootstrap = "--static" if BOOTSTRAP else ""
 
 
-options = "--prefix='' --with-bearssl --with-zlib --host=none"
+options = "--prefix='' --with-bearssl --with-zlib --disable-manual --host=none"
 
 out = automake(source, options, target="install-strip", env={
   "CC" : "clang",
@@ -21,6 +21,13 @@ out = automake(source, options, target="install-strip", env={
   "LD" : "lld",
   "LDFLAGS" : ldflags + " " + bootstrap
 })
+
+dev = source + "-dev"
+shell("mkdir -p %s/bin" % dev)
+shell("cd %s; mv %s/bin/curl-config bin/curl-config" % (dev, out))
+shell("cd %s; mv %s/include ." % (dev, out))
+shell("cd %s; mv %s/lib ." % (dev, out))
+shell("cd %s; mv %s/share ." % (dev, out))
 
 CURL = struct(
   name    = name, 

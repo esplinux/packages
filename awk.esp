@@ -8,7 +8,7 @@ load("musl.esp", "MUSL")
 
 cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL.sysroot
 bootstrap = "--static" if BOOTSTRAP else ""
-target = "HOSTCC=clang YACC='yacc -d' CFLAGS='%s %s'" % (cflags, bootstrap)
+target = "HOSTCC=clang YACC='yacc -d' CFLAGS='%s %s' LDFLAGS='-s -w'" % (cflags, bootstrap)
 make(source, "-j %s %s" % (NPROC, target))
 
 out = path(name + "-out")
