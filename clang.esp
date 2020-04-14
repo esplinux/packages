@@ -3,6 +3,7 @@ version = "10.0.0"
 rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
+#load("musl.esp", "MUSL")
 
 clangBuild= path("clang-build")
 shell("mkdir %s" % clangBuild)
@@ -13,8 +14,12 @@ shell("""cd %s; cmake %s \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DLLVM_BUILD_STATIC=ON \
-    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DLLVM_ENABLE_ASSERTIONS=ON \
+    -DLLVM_ENABLE_EH=ON \
+    -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_ENABLE_ZLIB=OFF \
     -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
@@ -22,8 +27,12 @@ shell("""cd %s; cmake %s \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DLLVM_ENABLE_PROJECTS="clang;clang-resource-headers" \
-    -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers"
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DLLVM_ENABLE_PROJECTS="clang;clang-resource-headers;compiler-rt" \
+    -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers;compiler-rt"
 """ % (clangBuild, LLVMSOURCE))
 
 clangOut= path("clang-out")
