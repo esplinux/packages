@@ -1,0 +1,39 @@
+name    = "clang" 
+version = "10.0.0" 
+rev     = "0"
+
+load("llvmSource.esp", "LLVMSOURCE")
+
+clangBuild= path("clang-build")
+shell("mkdir %s" % clangBuild)
+shell("""cd %s; cmake %s \
+    -DCMAKE_INSTALL_PREFIX='' \
+    -DCMAKE_BUILD_TYPE=MinSizeRel \
+    -DCMAKE_ASM_COMPILER=clang \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DLLVM_BUILD_STATIC=ON \
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    -DLLVM_ENABLE_ZLIB=OFF \
+    -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
+    -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DLLVM_ENABLE_PROJECTS="clang" \
+    -DLLVM_DISTRIBUTION_COMPONENTS="clang"
+""" % (clangBuild, LLVMSOURCE))
+
+clangOut= path("clang-out")
+make(clangBuild, "-j %s install-distribution-stripped" % NPROC, env={
+  "DESTDIR" : clangOut
+})
+
+CLANG = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(clangOut, name, version, rev)
+)

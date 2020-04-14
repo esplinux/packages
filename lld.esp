@@ -1,11 +1,11 @@
-name    = "llvm" 
+name    = "lld" 
 version = "10.0.0" 
 rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
 
-llvmBuild = path("llvm-build")
-shell("mkdir %s" % llvmBuild)
+lldBuild= path("lld-build")
+shell("mkdir %s" % lldBuild)
 shell("""cd %s; cmake %s \
     -DCMAKE_INSTALL_PREFIX='' \
     -DCMAKE_BUILD_TYPE=MinSizeRel \
@@ -18,17 +18,18 @@ shell("""cd %s; cmake %s \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_ENABLE_ZLIB=OFF \
     -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
-    -DLLVM_DISTRIBUTION_COMPONENTS="llvm-ar;llvm-nm;llvm-objcopy;llvm-objdump;llvm-ranlib;llvm-strip"
-""" % (llvmBuild, LLVMSOURCE))
+    -DLLVM_ENABLE_PROJECTS="lld" \
+    -DLLVM_DISTRIBUTION_COMPONENTS="lld"
+""" % (lldBuild, LLVMSOURCE))
 
-llvmOut = path("llvm-out")
-make(llvmBuild, "-j %s install-distribution-stripped" % NPROC, env={
-  "DESTDIR" : llvmOut
+lldOut = path("lld-out")
+make(lldBuild, "-j %s install-distribution-stripped" % NPROC, env={
+  "DESTDIR" : lldOut
 })
 
-LLVM = struct(
+LLD = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(llvmOut, name, version, rev)
+  package = tarball(lldOut, name, version, rev)
 )

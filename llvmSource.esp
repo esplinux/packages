@@ -1,0 +1,6 @@
+name    = "llvm" 
+version = "10.0.0" 
+rev     = "0"
+
+source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/llvm-project-%s.tar.xz" % (version, version))
+LLVMSOURCE = source + "/llvm"
