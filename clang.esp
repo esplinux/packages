@@ -22,8 +22,8 @@ shell("""cd %s; cmake %s \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DLLVM_ENABLE_PROJECTS="clang" \
-    -DLLVM_DISTRIBUTION_COMPONENTS="clang"
+    -DLLVM_ENABLE_PROJECTS="clang;clang-resource-headers" \
+    -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers"
 """ % (clangBuild, LLVMSOURCE))
 
 clangOut= path("clang-out")
