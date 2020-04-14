@@ -1,0 +1,45 @@
+name    = "llvm" 
+version = "10.0.0" 
+rev     = "0"
+
+source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/llvm-project-%s.tar.xz" % (version, version))
+llvmSource = source + "/llvm"
+
+#-DLLVM_TOOLCHAIN_TOOLS="llvm-ar;llvm-as;llvm-nm;llvm-objcopy;llvm-objdump;llvm-ranlib;llvm-readelf;llvm-strip" \
+#-DCLANG_TOOL_C_ARCMT_TEST_BUILD=OFF \
+#-DCLANG_TOOL_C_INDEX_TEST_BUILD=OFF \
+#-DCLANG_ENABLE_ARCMT=OFF \
+llvmBuild = path("llvm-build")
+shell("mkdir %s" % llvmBuild)
+shell("""cd %s; cmake %s \
+    -DCMAKE_INSTALL_PREFIX='' \
+    -DCMAKE_BUILD_TYPE=MinSizeRel \
+    -DCMAKE_ASM_COMPILER=clang \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DLLVM_BUILD_STATIC=ON \
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    -DLLVM_ENABLE_ZLIB=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
+    -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
+    -DLLVM_TARGETS_TO_BUILD="Native" \
+    -DLLVM_DISTRIBUTION_COMPONENTS="clang;lld;llvm-ar;llvm-nm;llvm-objcopy;llvm-objdump;llvm-ranlib;llvm-strip" \
+    -DPACKAGE_VENDOR="esplinux"
+""" % (llvmBuild, llvmSource))
+
+# todo: Figure out install-distribution
+#llvmOut = path("llvm-out")
+#make(llvmBuild, "-j %s install-distribution-stripped" % NPROC, env={
+#  "DESTDIR" : llvmOut
+#})
+
+#LLVM = struct(
+#  name    = name, 
+#  version = version, 
+#  rev     = rev,
+#  package = tarball(llvmOut, name, version, rev),
+#)
