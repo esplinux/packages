@@ -3,10 +3,11 @@ version = "10.0.0"
 rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
-#load("musl.esp", "MUSL")
 
-clangBuild= path("clang-build")
-shell("mkdir %s" % clangBuild)
+static = "ON" if BOOTSTRAP else "OFF"
+
+build = path("clang-build")
+shell("mkdir %s" % build)
 shell("""cd %s; cmake %s \
     -DCMAKE_INSTALL_PREFIX='' \
     -DCMAKE_BUILD_TYPE=MinSizeRel \
@@ -22,7 +23,7 @@ shell("""cd %s; cmake %s \
     -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_ENABLE_ZLIB=OFF \
-    -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
+    -DLLVM_INSTALL_TOOLCHAIN_ONLY=%s \
     -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
@@ -33,16 +34,18 @@ shell("""cd %s; cmake %s \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
     -DLLVM_ENABLE_PROJECTS="clang;clang-resource-headers;compiler-rt" \
     -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers;compiler-rt"
-""" % (clangBuild, LLVMSOURCE))
+""" % (build, LLVMSOURCE, static))
 
-clangOut= path("clang-out")
-make(clangBuild, "-j %s install-distribution-stripped" % NPROC, env={
-  "DESTDIR" : clangOut
+out = path("clang-out")
+make(build, "-j %s install-distribution-stripped" % NPROC, env={
+  "DESTDIR" : out
 })
 
 CLANG = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(clangOut, name, version, rev)
+  package = tarball(out, name, version, rev),
+  cc      = out + "/bin/clang",
+  cxx     = out + "/bin/clang++"
 )

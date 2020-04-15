@@ -4,31 +4,33 @@ rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
 
-llvmBuild = path("llvm-build")
-shell("mkdir %s" % llvmBuild)
+static = "ON" if BOOTSTRAP else "OFF"
+
+build = path("llvm-build")
+shell("mkdir %s" % build)
 shell("""cd %s; cmake %s \
     -DCMAKE_INSTALL_PREFIX='' \
     -DCMAKE_BUILD_TYPE=MinSizeRel \
     -DCMAKE_ASM_COMPILER=clang \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
-    -DLLVM_BUILD_STATIC=ON \
+    -DLLVM_BUILD_STATIC=%s \
     -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_ENABLE_ZLIB=OFF \
     -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
     -DLLVM_DISTRIBUTION_COMPONENTS="llvm-ar;llvm-nm;llvm-objcopy;llvm-objdump;llvm-ranlib;llvm-strip"
-""" % (llvmBuild, LLVMSOURCE))
+""" % (build, LLVMSOURCE, static))
 
-llvmOut = path("llvm-out")
-make(llvmBuild, "-j %s install-distribution-stripped" % NPROC, env={
-  "DESTDIR" : llvmOut
+out = path("llvm-out")
+make(build, "-j %s install-distribution-stripped" % NPROC, env={
+  "DESTDIR" : out
 })
 
 LLVM = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(llvmOut, name, version, rev)
+  package = tarball(out, name, version, rev)
 )

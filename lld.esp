@@ -4,15 +4,17 @@ rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
 
-lldBuild= path("lld-build")
-shell("mkdir %s" % lldBuild)
+static = "ON" if BOOTSTRAP else "OFF"
+
+build = path("lld-build")
+shell("mkdir %s" % build)
 shell("""cd %s; cmake %s \
     -DCMAKE_INSTALL_PREFIX='' \
     -DCMAKE_BUILD_TYPE=MinSizeRel \
     -DCMAKE_ASM_COMPILER=clang \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
-    -DLLVM_BUILD_STATIC=ON \
+    -DLLVM_BUILD_STATIC=%s \
     -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
@@ -20,16 +22,17 @@ shell("""cd %s; cmake %s \
     -DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
     -DLLVM_ENABLE_PROJECTS="lld" \
     -DLLVM_DISTRIBUTION_COMPONENTS="lld"
-""" % (lldBuild, LLVMSOURCE))
+""" % (build, LLVMSOURCE, static))
 
-lldOut = path("lld-out")
-make(lldBuild, "-j %s install-distribution-stripped" % NPROC, env={
-  "DESTDIR" : lldOut
+out = path("lld-out")
+make(build, "-j %s install-distribution-stripped" % NPROC, env={
+  "DESTDIR" : out
 })
 
 LLD = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(lldOut, name, version, rev)
+  package = tarball(out, name, version, rev),
+  ld      = out + "/bin/ld.lld"
 )
