@@ -3,69 +3,34 @@ version = "10.0.0"
 rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
-load("linuxHeaders.esp", "LINUXHEADERS")
-load("musl.esp", "MUSL")
+#load("linuxHeaders.esp", "LINUXHEADERS")
+#load("musl.esp", "MUSL")
 
 static = "ON" if BOOTSTRAP else "OFF"
-#dylib = "OFF" if BOOTSTRAP else "ON"
 
-build = path("clang-build")
-shell("mkdir %s" % build)
-#-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
-#-DLLVM_TOOL_LLVM_RTDYLD_BUILD=OFF \
-#-DCMAKE_EXE_LINKER_FLAGS='-rtlib=compiler-rt' \
-#-DCMAKE_SHARED_LINKER_FLAGS='-rtlib=compiler-rt' \
-#-DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-musl \
-#-DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers;compiler-rt"
-#-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
-#-DCMAKE_ASM_COMPILER=clang \
-#-DCMAKE_C_COMPILER=clang \
-#-DCMAKE_CXX_COMPILER=clang++ \
-#-DCMAKE_C_FLAGS='-I%s' \
-#-DCMAKE_CXX_FLAGS='-I%s' \
-#-DLLVM_LINK_LLVM_DYLIB=%s \
-shell("""cd %s; cmake %s \
-    -DCMAKE_INSTALL_PREFIX='' \
-    -DCMAKE_BUILD_TYPE=MinSizeRel \
-    -DCMAKE_ASM_COMPILER=clang \
-    -DCMAKE_C_COMPILER=clang \
-    -DCMAKE_CXX_COMPILER=clang++ \
-    -DLLVM_BUILD_STATIC=%s \
-    -DLLVM_ENABLE_ASSERTIONS=ON \
-    -DLLVM_ENABLE_EH=ON \
-    -DLLVM_ENABLE_LIBEDIT=OFF \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_RTTI=ON \
-    -DLLVM_ENABLE_TERMINFO=OFF \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_Z3_SOLVER=OFF \
-    -DLLVM_ENABLE_ZLIB=OFF \
-    -DLLVM_HOST_TRIPLE=x86_64-unknown-linux-musl \
-    -DCLANG_DEFAULT_LINKER=lld \
-    -DCLANG_DEFAULT_RTLIB=compiler-rt \
-    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
-    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
-    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
-    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
-    -DCOMPILER_RT_BUILD_XRAY=OFF \
-    -DLLVM_ENABLE_PROJECTS="clang;clang-resource-headers;compiler-rt" \
-    -DLLVM_DISTRIBUTION_COMPONENTS="clang;clang-resource-headers;compiler-rt"
-""" % (build, LLVMSOURCE, static))
-
-out = path("clang-out")
-
-make(build, "-j %s install-distribution-stripped" % NPROC, env={
-  "DESTDIR" : out
-})
-
-make(build, "-j %s install-llvm-libraries-stripped" % NPROC, env={
-  "DESTDIR" : out
-})
-
-make(build, "-j %s install-llvm-readelf" % NPROC, env={
-  "DESTDIR" : out
-})
+out = cmake(LLVMSOURCE, {
+    "LLVM_BUILD_STATIC": static,
+    "LLVM_ENABLE_ASSERTIONS": "ON",
+    "LLVM_ENABLE_EH": "ON",
+    "LLVM_ENABLE_LIBEDIT": "OFF",
+    "LLVM_ENABLE_LIBXML2": "OFF",
+    "LLVM_ENABLE_LLD": "ON",
+    "LLVM_ENABLE_RTTI": "ON",
+    "LLVM_ENABLE_TERMINFO": "OFF",
+    "LLVM_ENABLE_Z3_SOLVER": "OFF",
+    "LLVM_ENABLE_ZLIB": "OFF",
+    "LLVM_HOST_TRIPLE": "x86_64-unknown-linux-musl",
+    "CLANG_DEFAULT_LINKER": "lld",
+    "CLANG_DEFAULT_RTLIB": "compiler-rt",
+    "CLANG_DEFAULT_UNWINDLIB": "libunwind",
+    "CLANG_DEFAULT_CXX_STDLIB": "libc++",
+    "COMPILER_RT_USE_BUILTINS_LIBRARY": "ON",
+    "COMPILER_RT_BUILD_LIBFUZZER": "OFF",
+    "COMPILER_RT_BUILD_SANITIZERS": "OFF",
+    "COMPILER_RT_BUILD_XRAY": "OFF",
+    "LLVM_ENABLE_PROJECTS": "clang;clang-resource-headers;compiler-rt",
+    "LLVM_DISTRIBUTION_COMPONENTS": "clang;clang-resource-headers;compiler-rt"
+}, target="install-distribution-stripped")
 
 CLANG = struct(
   name    = name, 

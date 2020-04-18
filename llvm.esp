@@ -3,36 +3,21 @@ version = "10.0.0"
 rev     = "0"
 
 load("llvmSource.esp", "LLVMSOURCE")
-load("linuxHeaders.esp", "LINUXHEADERS")
-load("musl.esp", "MUSL")
 
 static = "ON" if BOOTSTRAP else "OFF"
 
-build = path("llvm-build")
-shell("mkdir %s" % build)
-shell("""cd %s; cmake %s \
-    -DCMAKE_INSTALL_PREFIX='' \
-    -DCMAKE_BUILD_TYPE=MinSizeRel \
-    -DCMAKE_ASM_COMPILER=clang \
-    -DCMAKE_C_COMPILER=clang \
-    -DCMAKE_CXX_COMPILER=clang++ \
-    -DLLVM_BUILD_STATIC=%s \
-    -DLLVM_ENABLE_ASSERTIONS=ON \
-    -DLLVM_ENABLE_EH=ON \
-    -DLLVM_ENABLE_LIBEDIT=OFF \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_RTTI=ON \
-    -DLLVM_ENABLE_TERMINFO=OFF \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_Z3_SOLVER=OFF \
-    -DLLVM_ENABLE_ZLIB=OFF \
-    -DLLVM_HOST_TRIPLE=x86_64-unknown-linux-musl
-""" % (build, LLVMSOURCE, static))
-
-out = path("llvm-out")
-
-make(build, "-j %s install" % NPROC, env={
-  "DESTDIR" : out
+out = cmake(LLVMSOURCE, {
+    "LVM_BUILD_STATIC": static,
+    "LVM_ENABLE_ASSERTIONS": "ON",
+    "LVM_ENABLE_EH": "ON",
+    "LVM_ENABLE_LIBEDIT": "OFF",
+    "LVM_ENABLE_LIBXML2": "OFF
+    "LVM_ENABLE_LLD": "ON",
+    "LVM_ENABLE_RTTI": "ON",
+    "LVM_ENABLE_TERMINFO": "OFF",
+    "LVM_ENABLE_Z3_SOLVER": "OFF",
+    "LVM_ENABLE_ZLIB": "OFF",
+    "LVM_HOST_TRIPLE": "x86_64-unknown-linux-musl"
 })
 
 LLVM = struct(

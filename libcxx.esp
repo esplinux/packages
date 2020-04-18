@@ -10,51 +10,37 @@ load("clang.esp", "CLANG")
 cc = "clang" if BOOTSTRAP else CLANG.cc
 cxx = "clang++" if BOOTSTRAP else CLANG.cxx
 
-
-build = path("libcxx-build")
-shell("mkdir %s" % build)
 #-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
 #-DLLVM_TOOL_LLVM_RTDYLD_BUILD=OFF \
-shell("""cd %s; cmake %s \
-    -DCMAKE_INSTALL_PREFIX='' \
-    -DCMAKE_BUILD_TYPE=MinSizeRel \
-    -DCMAKE_ASM_COMPILER=clang \
-    -DCMAKE_C_COMPILER=%s\
-    -DCMAKE_C_FLAGS='-I%s' \
-    -DCMAKE_CXX_COMPILER=%s \
-    -DCMAKE_CXX_FLAGS='-I%s' \
-    -DCMAKE_EXE_LINKER_FLAGS='-rtlib=compiler-rt' \
-    -DCMAKE_SHARED_LINKER_FLAGS='-rtlib=compiler-rt' \
-    -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-musl \
-    -DLLVM_ENABLE_TERMINFO=OFF \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_Z3_SOLVER=OFF \
-    -DLLVM_ENABLE_ZLIB=OFF \
-    -DLLVM_HOST_TRIPLE=x86_64-unknown-linux-musl \
-    -DLLVM_INCLUDE_TESTS=OFF \
-    -DLLVM_USE_LINKER=lld \
-    -DLIBUNWIND_USE_COMPILER_RT=ON \
-    -DLIBUNWIND_SYSROOT=%s \
-    -DLIBUNWIND_TARGET_TRIPLE=x86_64-unknown-linux-musl \
-    -DLIBCXXABI_USE_COMPILER_RT=ON \
-    -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
-    -DLIBCXXABI_SYSROOT=%s \
-    -DLIBCXXABI_TARGET_TRIPLE=x86_64-unknown-linux-musl \
-    -DLIBCXX_USE_COMPILER_RT=ON \
-    -DLIBCXX_HAS_MUSL_LIBC=ON \
-    -DLIBCXX_SYSROOT=%s \
-    -DLIBCXX_TARGET_TRIPLE=x86_64-unknown-linux-musl \
-    -DLLVM_ENABLE_PROJECTS='libunwind;libcxxabi;libcxx' 
-""" % (build, LLVMSOURCE, cc, LINUXHEADERS.include, cxx, LINUXHEADERS.include, MUSL.sysroot, MUSL.sysroot, MUSL.sysroot))
-
-out = path("libcxx-out")
-make(build, "-j %s install-unwind install-cxxabi install-cxx" % NPROC, env={
-  "DESTDIR" : out
-})
+out = cmake(LLVMSOURCE, {
+    "CMAKE_C_FLAGS": "-I" + LINUXHEADERS.include,
+    "CMAKE_CXX_FLAGS": "-I" + LINUXHEADERS.include,
+    "LLVM_DEFAULT_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
+    "LLVM_ENABLE_TERMINFO": "OFF",
+    "LLVM_ENABLE_LIBXML2": "OFF",
+    "LLVM_ENABLE_Z3_SOLVER": "OFF",
+    "LLVM_ENABLE_ZLIB": "OFF",
+    "LLVM_HOST_TRIPLE": "x86_64-unknown-linux-musl",
+    "LLVM_INCLUDE_TESTS": "OFF",
+    "LLVM_USE_LINKER": "lld",
+    "LIBUNWIND_USE_COMPILER_RT": "ON",
+    "LIBUNWIND_SYSROOT": MUSL.sysroot,
+    "LIBUNWIND_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
+    "LIBCXXABI_USE_COMPILER_RT": "ON",
+    "LIBCXXABI_USE_LLVM_UNWINDER": "ON",
+    "LIBCXXABI_SYSROOT": MUSL.sysroot,
+    "LIBCXXABI_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
+    "LIBCXX_USE_COMPILER_RT": "ON \
+    "LIBCXX_HAS_MUSL_LIBC": "ON",
+    "LIBCXX_SYSROOT": MUSL.sysroot,
+    "LIBCXX_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
+    "LLVM_ENABLE_PROJECTS": "libunwind;libcxxabi;libcxx"
+  }, % (LINUXHEADERS.include, LINUXHEADERS.include, MUSL.sysroot, MUSL.sysroot, MUSL.sysroot), 
+  target="install-unwind, install-cxxabi, install-cxx")
 
 LIBCXX = struct(
   name    = name, 
   version = version, 
   rev     = rev,
   package = tarball(out, name, version, rev)
-)
+:)
