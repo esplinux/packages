@@ -1,5 +1,5 @@
 name    = "dash"
-version = "0.5.10"
+version = "0.5.10.2"
 rev     = "0"
 
 source = fetch("http://gondor.apana.org.au/~herbert/dash/files/dash-%s.tar.gz" % version)
@@ -18,8 +18,8 @@ out = automake(source, env={
 shell("cd %s/bin; ln -s dash sh" % out)
 
 DASH = struct(
-  name    = "dash", 
-  version = "0.5.10", 
-  rev     = "0",
+  name    = name, 
+  version = version, 
+  rev     = rev,
   package = tarball(out , name, version, rev)
 )
