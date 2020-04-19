@@ -4,12 +4,16 @@ rev     = "0"
 
 source = fetch(git="https://github.com/onetrueawk/awk")
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
-cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL.sysroot
-bootstrap = "--static" if BOOTSTRAP else ""
-target = "HOSTCC=clang YACC='yacc -d' CFLAGS='%s %s' LDFLAGS='-s -w'" % (cflags, bootstrap)
-make(source, "-j %s %s" % (NPROC, target))
+tools = "HOSTCC=" + HOST.cc + " YACC='" + HOST.yacc + " -d'"
+
+_cflags = "-Qunused-arguments --sysroot=%s -O3" % MUSL.sysroot
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
+
+target = "CFLAGS='%s' LDFLAGS='-s -w'" % cflags
+make(source, "-j %s %s %s" % (NPROC, tools, target))
 
 out = path(name + "-out")
 shell("mkdir -p %s/bin" % out)

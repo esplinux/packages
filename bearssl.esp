@@ -4,19 +4,21 @@ rev     = "0"
 
 source = fetch(git="https://www.bearssl.org/git/BearSSL")
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 out = source + "-out"
 cflags = "-fPIC -Qunused-arguments --sysroot=%s -O3" % MUSL.sysroot
-ldflags = "-rtlib=compiler-rt --sysroot=%s" % MUSL.sysroot
+ldflags = cflags + " --static" if BOOTSTRAP else cflags
 
 shell("printf 'include conf/Unix.mk\n' > %s/conf/esp.mk" % source)
 shell("printf 'BUILD=%s\n' >> %s/conf/esp.mk" % (out, source))
-shell("printf 'CC=clang\n' >> %s/conf/esp.mk" % source)
+shell("printf 'AR=" + HOST.ar + "\n' >> %s/conf/esp.mk" % source)
+shell("printf 'CC=" + HOST.cc + "\n' >> %s/conf/esp.mk" % source)
 shell("printf 'CFLAGS=%s\n' >> %s/conf/esp.mk" % (cflags, source))
-shell("printf 'LD=clang\n' >> %s/conf/esp.mk" % source)
+shell("printf 'LD=" + HOST.cc + "\n' >> %s/conf/esp.mk" % source)
 shell("printf 'LDFLAGS=%s\n' >> %s/conf/esp.mk" % (ldflags, source))
-shell("printf 'LDDLL=clang\n' >> %s/conf/esp.mk" % source)
+shell("printf 'LDDLL=" + HOST.cc + "\n' >> %s/conf/esp.mk" % source)
 make(source, "-j %s CONF=esp" % NPROC)
 
 shell("cd %s; mkdir bin" % out)

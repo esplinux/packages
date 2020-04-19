@@ -4,11 +4,16 @@ rev     = "0"
 
 source = fetch("https://www.zlib.net/zlib-%s.tar.gz" % version)
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
+_cflags = "--sysroot=%s -O3" % MUSL.sysroot
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
+
 out = automake(source, env={
-  "CC" : "clang",
-  "CFLAGS" : "--sysroot=%s -rtlib=compiler-rt -O3" % MUSL.sysroot
+  "AR": HOST.ar,
+  "CC": HOST.cc,
+  "CFLAGS": cflags,
 })
 
 ZLIB = struct(

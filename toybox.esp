@@ -4,16 +4,17 @@ rev     = "0"
 
 source = fetch(git="https://github.com/landley/toybox")
 
+load("host.esp", "HOST")
 load("linuxHeaders.esp", "LINUXHEADERS")
 load("musl.esp", "MUSL")
 
 out = source + "-out"
 
-tools = "CC=clang HOSTCC=clang"
-cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -I%s -Os" % (MUSL.sysroot, LINUXHEADERS.include)
-bootstrap = "--static" if BOOTSTRAP else ""
+tools = "CC=" + HOST.cc + " HOSTCC=" + HOST.cc
+_cflags = "-Qunused-arguments --sysroot=%s -I%s -Os" % (MUSL.sysroot, LINUXHEADERS.include)
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 target = "PREFIX=%s/bin defconfig toybox install_flat" % out
-make(source, "%s CFLAGS='%s %s' %s" % (tools, cflags, bootstrap, target))
+make(source, "%s CFLAGS='%s' %s" % (tools, cflags, target))
 
 TOYBOX = struct(
   name    = "toybox", 

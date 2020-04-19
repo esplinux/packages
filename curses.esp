@@ -4,14 +4,24 @@ rev     = "0"
 
 source = fetch(git="https://github.com/sabotage-linux/netbsd-curses")
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 out = source + "-out"
 shell("mkdir %s" % out)
 
-cflags = "-Qunused-arguments --sysroot=%s -rtlib=compiler-rt -O3" % MUSL.sysroot
-target = "HOSTCC=clang CC='clang %s' PREFIX='' DESTDIR=%s install" % (cflags, out)
-make(source, "-j %s %s" % (NPROC, target))
+_cflags = "-Qunused-arguments --sysroot=%s -O3" % MUSL.sysroot
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
+
+#tools = "HOSTCC=" + HOST.cc + " CC='" + HOST.cc + " %s'" % cflags
+target = "PREFIX='' DESTDIR=%s install" %  out
+
+make(source, "-j %s %s" % (NPROC, target), env={
+  "AR": HOST.ar,
+  "CC": HOST.cc,
+  "CFLAGS": cflags,
+  "RANLIB": HOST.ranlib,
+})
 
 CURSES = struct(
   name    = name, 

@@ -1,0 +1,115 @@
+llvmVersion = "10.0.0"
+pythonVersion = "3.8"
+
+llvmSourceBase = "https://github.com/llvm/llvm-project/releases/download/llvmorg-%s" % llvmVersion
+llvmSourceURL = llvmSourceBase + "/llvm-%s.src.tar.xz" % llvmVersion
+clangSourceURL = llvmSourceBase + "/clang-%s.src.tar.xz" % llvmVersion
+lldSourceURL = llvmSourceBase + "/lld-%s.src.tar.xz" % llvmVersion
+
+yaccSource = "https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz"
+
+pythonSource = "https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz"
+
+def which(command):
+  return shell("which " + command + " | cat").strip(" \n")
+
+def whichVersion(command, llvmVersion):
+  commandPath = which(command)
+  if commandPath != "":
+    if llvmVersion in shell(commandPath + " --version"):
+      return commandPath
+  return ""
+
+def hostCMake(source):
+    hostSource = source + "-host"
+    shell("mv " + source + " " + hostSource)
+    return cmake(hostSource)
+
+def hostAutomake(source):
+    hostSource = source + "-host"
+    shell("mv " + source + " " + hostSource)
+    return automake(hostSource)
+
+
+def llvm():
+  hostLLVM = whichVersion("llvm-config", llvmVersion)
+  hostAR = which("llvm-ar")
+  hostNM = which("llvm-nm")
+  hostOBJCOPY = which("llvm-objcopy")
+  hostRANLIB= which("llvm-ranlib")
+  hostSTRIP = which("llvm-strip")
+  if (hostLLVM != "") and (hostAR != ""):
+    return (hostAR, hostNM, hostOBJCOPY, hostRANLIB, hostSTRIP)
+  else:
+    hostLLVMOut = hostCMake( fetch(llvmSourceURL) )
+    return (
+      hostLLVMOut + "/bin/llvm-ar",
+      hostLLVMOut + "/bin/llvm-nm",
+      hostLLVMOut + "/bin/llvm-objcopy",
+      hostLLVMOut + "/bin/llvm-ranlib",
+      hostLLVMOut + "/bin/llvm-strip",
+    )
+
+def clang():
+  hostCC = whichVersion("clang", llvmVersion)
+  hostCXX = whichVersion("clang++", llvmVersion)
+  if (hostCC != "") and (hostCXX != ""):
+    return (hostCC, hostCXX)
+  else:
+    hostClangOut = hostCMake( fetch(clangSourceURL) )
+    return (
+      hostClangOut + "/bin/clang", 
+      hostClangOut + "/bin/clang++",
+    )
+
+def lld():
+  hostLLD = which("lld")
+  hostLD = whichVersion("ld.lld", llvmVersion)
+  if hostLD != "":
+    return (hostLLD, hostLD)
+  else:
+    hostLLDOut = hostCMake( fetch(lldSourceURL) )
+    return (
+      hostLLDOut + "/bin/lld", 
+      hostLLDOut + "/bin/ld.lld",
+    )
+
+def yacc():
+  hostYacc = which("yacc")
+  if hostYacc != "":
+    return hostYacc
+  else:
+    hostYaccOut = hostAutomake( fetch(yaccSource) )
+    return hostYaccOut + "/bin/yacc"
+    
+
+def python():
+  hostPython = whichVersion("python3", pythonVersion)
+  if hostPython != "":
+    return hostPython
+  else:
+    hostPythonOut = hostAutomake( fetch(pythonSource) )
+    return hostPythonOut + "/bin/python3"
+
+(hostAR, hostNM, hostOBJCOPY, hostRANLIB, hostSTRIP) = llvm()
+(hostCC, hostCXX)  = clang()
+(hostLLD, hostLD)  = lld()
+
+hostPYTHON = python()
+
+hostYACC = yacc()
+
+HOST = struct(
+  ar  = hostAR,
+  asm = hostCC,
+  cc  = hostCC,
+  cxx = hostCXX,
+  ld  = hostLD,
+  lld = hostLLD,
+  nm = hostNM,
+  objcopy = hostOBJCOPY,
+  python = hostPYTHON,
+  ranlib = hostRANLIB,
+  strip = hostSTRIP,
+  yacc = hostYACC,
+)

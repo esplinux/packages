@@ -4,14 +4,15 @@ rev     = "0"
 
 source = fetch("https://invisible-mirror.net/archives/byacc/byacc-%s.tgz" % version)
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
-cflags = "--sysroot=%s --rtlib=compiler-rt -O3" % MUSL.sysroot
-bootstrap = "--static" if BOOTSTRAP else ""
+_cflags = "--sysroot=%s -O3" % MUSL.sysroot
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 
 out = automake(source, env={
-  "CC" : "clang",
-  "CFLAGS" : cflags + " " + bootstrap,
+  "CC" : HOST.cc,
+  "CFLAGS" : cflags,
 })
 
 BYACC = struct(

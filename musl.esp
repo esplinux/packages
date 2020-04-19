@@ -2,10 +2,13 @@ name    = "musl"
 version = "1.2.0" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://musl.libc.org/releases/musl-%s.tar.gz" % version)
 out = automake(source, env={
-  "CC" : "clang",
-  "AR" : "llvm-ar"
+  "CC" : HOST.cc,
+  "AR" : HOST.ar,
+  "RANLIB" : HOST.ranlib
 })
 
 MUSL = struct(

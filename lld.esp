@@ -2,26 +2,15 @@ name    = "lld"
 version = "10.0.0" 
 rev     = "0"
 
-load("llvmSource.esp", "LLVMSOURCE")
+source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/lld-%s.src.tar.xz" % (version, version))
 
-static = "ON" if BOOTSTRAP else "OFF"
-
-out = cmake(LLVMSOURCE, {
-    "LLVM_BUILD_STATIC": static,
-    "LLVM_ENABLE_ASSERTIONS": "ON",
+out = cmake(source, {
+    "CMAKE_C_COMPILER": "clang",
+    "CMAKE_CXX_COMPILER": "clang++",
+    "LLD_BUILD_TOOLS": "OFF",
     "LLVM_ENABLE_EH": "ON",
-    "LLVM_ENABLE_LIBEDIT": "OFF",
-    "LLVM_ENABLE_LIBXML2": "OFF",
-    "LLVM_ENABLE_LLD": "ON",
     "LLVM_ENABLE_RTTI": "ON",
-    "LLVM_ENABLE_TERMINFO": "OFF",
-    "LLVM_ENABLE_LIBXML2": "OFF",
-    "LLVM_ENABLE_Z3_SOLVER": "OFF",
-    "LLVM_ENABLE_ZLIB": "OFF",
-    "LLVM_HOST_TRIPLE": "x86_64-unknown-linux-musl",
-    "LLVM_ENABLE_PROJECTS": "lld",
-    "LLVM_DISTRIBUTION_COMPONENTS": "lld"
-}, target="install-distribution-stripped")
+})
 
 LLD = struct(
   name    = name, 

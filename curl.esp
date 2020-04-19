@@ -4,21 +4,21 @@ rev     = "0"
 
 source = fetch("https://curl.haxx.se/download/curl-%s.tar.gz" % version)
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 load("zlib.esp", "ZLIB")
 load("bearssl.esp", "BEARSSL")
 
-cflags = "-O3 -pipe --sysroot=%s -I%s -I%s" % (MUSL.sysroot, BEARSSL.include, ZLIB.include)
-ldflags = "-rtlib=compiler-rt --sysroot=%s -L%s -L%s -w -s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
+cflags = "--sysroot=%s -O3 -I%s -I%s" % (MUSL.sysroot, BEARSSL.include, ZLIB.include)
+ldflags = "--sysroot=%s -L%s -L%s -w -s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
 bootstrap = "--static" if BOOTSTRAP else ""
-
 
 options = "--prefix='' --with-bearssl --with-zlib --disable-manual --host=none"
 
 out = automake(source, options, target="install-strip", env={
-  "CC" : "clang",
+  "CC" : HOST.cc,
   "CFLAGS" : cflags + " " + bootstrap,
-  "LD" : "lld",
+  "LD" : HOST.ld,
   "LDFLAGS" : ldflags + " " + bootstrap
 })
 
