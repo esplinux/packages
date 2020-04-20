@@ -1,20 +1,18 @@
-name    = "lld" 
-version = "10.0.0" 
+name    = "libunwind"
+version = "10.0.0"
 rev     = "0"
 
-source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/lld-%s.src.tar.xz" % (version, version))
+source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libunwind-%s.src.tar.xz" % (version, version))
 
 load("host.esp", "HOST")
-load("llvm.esp", "LLVM")
 
-ldflags = "-w -s --static" if BOOTSTRAP else "-w -s"
-
+#-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
+#-DLLVM_TOOL_LLVM_RTDYLD_BUILD=OFF \
 out = cmake(source, {
   "CMAKE_ADDR2LINE": HOST.addr2line,
   "CMAKE_AR": HOST.ar,
   "CMAKE_C_COMPILER": HOST.cc,
   "CMAKE_CXX_COMPILER": HOST.cxx,
-  "CMAKE_EXE_LINKER_FLAGS": ldflags,
   "CMAKE_LINKER": HOST.ld,
   "CMAKE_NM": HOST.nm,
   "CMAKE_OBJCOPY": HOST.objcopy,
@@ -22,13 +20,16 @@ out = cmake(source, {
   "CMAKE_RANLIB": HOST.ranlib,
   "CMAKE_READELF": HOST.readelf,
   "CMAKE_STRIP": HOST.strip,
-  "LLVM_CONFIG_PATH": LLVM.config,
-}, target="install-lld")
+  "LLVM_ENABLE_EH": "ON",
+  "LLVM_ENABLE_RTTI": "ON",
+  "LIBUNWIND_USE_COMPILER_RT": "ON",
+})
 
-LLD = struct(
+LIBUNWIND = struct(
   name    = name, 
   version = version, 
   rev     = rev,
   package = tarball(out, name, version, rev),
-  lld     = out + "/bin/lld",
+  lib     = out + "/lib",
+  include = out + "/include",
 )

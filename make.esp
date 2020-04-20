@@ -4,16 +4,16 @@ rev     = "0"
 
 source = fetch("https://ftp.gnu.org/gnu/make/make-%s.tar.gz" % version)
 
+load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
-cflags = "--sysroot=%s -O3" % MUSL.sysroot
-bootstrap = "--static" if BOOTSTRAP else ""
+_cflags = "--sysroot=%s -O3" % MUSL.sysroot
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 
 out = automake(source, env={
-  "CC" : "clang",
-  "CFLAGS" : cflags + " " + bootstrap,
-  "LD" : "lld",
-  "LDFLAGS" : "-rtlib=compiler-rt"
+  "CC" : HOST.cc,
+  "CFLAGS" : cflags,
+  "LD" : HOST.ld,
 })
 
 MAKE = struct(

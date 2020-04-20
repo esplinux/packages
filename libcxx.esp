@@ -2,45 +2,70 @@ name    = "libcxx"
 version = "10.0.0"
 rev     = "0"
 
-load("llvmSource.esp", "LLVMSOURCE")
-load("linuxHeaders.esp", "LINUXHEADERS")
-load("musl.esp", "MUSL")
-load("clang.esp", "CLANG")
+abiSource = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libcxxabi-%s.src.tar.xz" % (version, version))
+source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libcxx-%s.src.tar.xz" % (version, version))
 
-cc = "clang" if BOOTSTRAP else CLANG.cc
-cxx = "clang++" if BOOTSTRAP else CLANG.cxx
+load("host.esp", "HOST")
+load("libunwind.esp", "LIBUNWIND")
 
-#-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
-#-DLLVM_TOOL_LLVM_RTDYLD_BUILD=OFF \
-out = cmake(LLVMSOURCE, {
-    "CMAKE_C_FLAGS": "-I" + LINUXHEADERS.include,
-    "CMAKE_CXX_FLAGS": "-I" + LINUXHEADERS.include,
-    "LLVM_DEFAULT_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
-    "LLVM_ENABLE_TERMINFO": "OFF",
-    "LLVM_ENABLE_LIBXML2": "OFF",
-    "LLVM_ENABLE_Z3_SOLVER": "OFF",
-    "LLVM_ENABLE_ZLIB": "OFF",
-    "LLVM_HOST_TRIPLE": "x86_64-unknown-linux-musl",
-    "LLVM_INCLUDE_TESTS": "OFF",
-    "LLVM_USE_LINKER": "lld",
-    "LIBUNWIND_USE_COMPILER_RT": "ON",
-    "LIBUNWIND_SYSROOT": MUSL.sysroot,
-    "LIBUNWIND_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
-    "LIBCXXABI_USE_COMPILER_RT": "ON",
-    "LIBCXXABI_USE_LLVM_UNWINDER": "ON",
-    "LIBCXXABI_SYSROOT": MUSL.sysroot,
-    "LIBCXXABI_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
-    "LIBCXX_USE_COMPILER_RT": "ON \
-    "LIBCXX_HAS_MUSL_LIBC": "ON",
-    "LIBCXX_SYSROOT": MUSL.sysroot,
-    "LIBCXX_TARGET_TRIPLE": "x86_64-unknown-linux-musl",
-    "LLVM_ENABLE_PROJECTS": "libunwind;libcxxabi;libcxx"
-  }, % (LINUXHEADERS.include, LINUXHEADERS.include, MUSL.sysroot, MUSL.sysroot, MUSL.sysroot), 
-  target="install-unwind, install-cxxabi, install-cxx")
+abiOut = cmake(abiSource, {
+  "CMAKE_ADDR2LINE": HOST.addr2line,
+  "CMAKE_AR": HOST.ar,
+  "CMAKE_C_COMPILER": HOST.cc,
+  "CMAKE_CXX_COMPILER": HOST.cxx,
+  "CMAKE_LINKER": HOST.ld,
+  "CMAKE_NM": HOST.nm,
+  "CMAKE_OBJCOPY": HOST.objcopy,
+  "CMAKE_OBJDUMP": HOST.objdump,
+  "CMAKE_RANLIB": HOST.ranlib,
+  "CMAKE_READELF": HOST.readelf,
+  "CMAKE_STRIP": HOST.strip,
+  "CMAKE_SHARED_LINKER_FLAGS": "-L" + LIBUNWIND.lib,
+  "LLVM_ENABLE_EH": "ON",
+  "LLVM_ENABLE_RTTI": "ON",
+  "LIBCXXABI_USE_COMPILER_RT": "ON",
+  "LIBCXXABI_USE_LLVM_UNWINDER": "ON",
+  "LIBCXXABI_LIBCXX_PATH": source,
+  "LIBCXXABI_LIBUNWIND_INCLUDES": LIBUNWIND.include,
+})
 
-LIBCXX = struct(
-  name    = name, 
+LIBCXXABI = struct(
+  name    = "libcxxabi", 
   version = version, 
   rev     = rev,
-  package = tarball(out, name, version, rev)
-:)
+  package = tarball(abiOut, "libcxxabi", version, rev),
+  lib     = abiOut + "/lib",
+  include = abiSource + "/include",
+)
+
+out = cmake(source, {
+  "CMAKE_ADDR2LINE": HOST.addr2line,
+  "CMAKE_AR": HOST.ar,
+  "CMAKE_C_COMPILER": HOST.cc,
+  "CMAKE_CXX_COMPILER": HOST.cxx,
+  "CMAKE_LINKER": HOST.ld,
+  "CMAKE_NM": HOST.nm,
+  "CMAKE_OBJCOPY": HOST.objcopy,
+  "CMAKE_OBJDUMP": HOST.objdump,
+  "CMAKE_RANLIB": HOST.ranlib,
+  "CMAKE_READELF": HOST.readelf,
+  "CMAKE_STRIP": HOST.strip,
+  "CMAKE_SHARED_LINKER_FLAGS": "-L" + LIBUNWIND.lib,
+  "LLVM_ENABLE_EH": "ON",
+  "LLVM_ENABLE_RTTI": "ON",
+  "LIBCXX_CXX_ABI": "libcxxabi",
+  "LIBCXX_CXX_ABI_INCLUDE_PATHS": LIBCXXABI.include,
+  "LIBCXX_CXX_ABI_LIBRARY_PATH": LIBCXXABI.lib,
+  "LIBCXX_HAS_MUSL_LIBC": "ON",
+  "LIBCXX_USE_COMPILER_RT": "ON",
+})
+
+LIBCXX = struct(
+  name    = "libcxx", 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, "libcxx", version, rev),
+  lib     = out + "/lib",
+  include = out + "/include",
+)
+

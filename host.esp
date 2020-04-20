@@ -33,20 +33,26 @@ def hostAutomake(source):
 
 def llvm():
   hostLLVM = whichVersion("llvm-config", llvmVersion)
+  hostADDR2LINE = which("llvm-addr2line")
   hostAR = which("llvm-ar")
   hostNM = which("llvm-nm")
   hostOBJCOPY = which("llvm-objcopy")
+  hostOBJDUMP = which("llvm-objdump")
   hostRANLIB= which("llvm-ranlib")
+  hostREADELF = which("llvm-readelf")
   hostSTRIP = which("llvm-strip")
   if (hostLLVM != "") and (hostAR != ""):
-    return (hostAR, hostNM, hostOBJCOPY, hostRANLIB, hostSTRIP)
+    return (hostADDR2LINE, hostAR, hostNM, hostOBJCOPY, hostOBJDUMP, hostRANLIB, hostREADELF, hostSTRIP)
   else:
     hostLLVMOut = hostCMake( fetch(llvmSourceURL) )
     return (
+      hostLLVMOut + "/bin/llvm-addr2line",
       hostLLVMOut + "/bin/llvm-ar",
       hostLLVMOut + "/bin/llvm-nm",
       hostLLVMOut + "/bin/llvm-objcopy",
+      hostLLVMOut + "/bin/llvm-objdump",
       hostLLVMOut + "/bin/llvm-ranlib",
+      hostLLVMOut + "/bin/llvm-readelf",
       hostLLVMOut + "/bin/llvm-strip",
     )
 
@@ -91,7 +97,7 @@ def python():
     hostPythonOut = hostAutomake( fetch(pythonSource) )
     return hostPythonOut + "/bin/python3"
 
-(hostAR, hostNM, hostOBJCOPY, hostRANLIB, hostSTRIP) = llvm()
+(hostADDR2LINE, hostAR, hostNM, hostOBJCOPY, hostOBJDUMP, hostRANLIB, hostREADELF, hostSTRIP) = llvm()
 (hostCC, hostCXX)  = clang()
 (hostLLD, hostLD)  = lld()
 
@@ -100,16 +106,19 @@ hostPYTHON = python()
 hostYACC = yacc()
 
 HOST = struct(
-  ar  = hostAR,
-  asm = hostCC,
-  cc  = hostCC,
-  cxx = hostCXX,
-  ld  = hostLD,
-  lld = hostLLD,
-  nm = hostNM,
-  objcopy = hostOBJCOPY,
-  python = hostPYTHON,
-  ranlib = hostRANLIB,
-  strip = hostSTRIP,
-  yacc = hostYACC,
+  addr2line  = hostADDR2LINE,
+  ar         = hostAR,
+  asm        = hostCC,
+  cc         = hostCC,
+  cxx        = hostCXX,
+  ld         = hostLD,
+  lld        = hostLLD,
+  nm         = hostNM,
+  objcopy    = hostOBJCOPY,
+  objdump    = hostOBJDUMP,
+  python     = hostPYTHON,
+  ranlib     = hostRANLIB,
+  readelf    = hostREADELF,
+  strip      = hostSTRIP,
+  yacc       = hostYACC,
 )

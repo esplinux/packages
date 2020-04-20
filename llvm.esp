@@ -4,23 +4,33 @@ rev     = "0"
 
 source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/llvm-%s.src.tar.xz" % (version, version))
 
+load("host.esp", "HOST")
+
 static = "ON" if BOOTSTRAP else "OFF"
 dylib = "OFF" if BOOTSTRAP else "ON"
 
 out = cmake(source, {
-    "CMAKE_ASM_COMPILER": "clang",
-    "CMAKE_C_COMPILER": "clang",
-    "CMAKE_CXX_COMPILER": "clang++",
-    "LLVM_BUILD_STATIC": static,
-    "LLVM_ENABLE_EH": "ON",
-    "LLVM_ENABLE_LIBEDIT": "OFF",
-    "LLVM_ENABLE_LIBXML2": "OFF",
-    "LLVM_ENABLE_LLD": "ON",
-    "LLVM_ENABLE_RTTI": "ON",
-    "LLVM_ENABLE_TERMINFO": "OFF",
-    "LLVM_INSTALL_BINUTILS_SYMLINKS": "ON",
-    "LLVM_LINK_LLVM_DYLIB": dylib,
-    "LLVM_TARGETS_TO_BUILD": "X86",
+  "CMAKE_ADDR2LINE": HOST.addr2line,
+  "CMAKE_AR": HOST.ar,
+  "CMAKE_C_COMPILER": HOST.cc,
+  "CMAKE_CXX_COMPILER": HOST.cxx,
+  "CMAKE_LINKER": HOST.ld,
+  "CMAKE_NM": HOST.nm,
+  "CMAKE_OBJCOPY": HOST.objcopy,
+  "CMAKE_OBJDUMP": HOST.objdump,
+  "CMAKE_RANLIB": HOST.ranlib,
+  "CMAKE_READELF": HOST.readelf,
+  "CMAKE_STRIP": HOST.strip,
+  "LLVM_BUILD_STATIC": static,
+  "LLVM_ENABLE_EH": "ON",
+  "LLVM_ENABLE_LIBEDIT": "OFF",
+  "LLVM_ENABLE_LIBXML2": "OFF",
+  "LLVM_ENABLE_LLD": "ON",
+  "LLVM_ENABLE_RTTI": "ON",
+  "LLVM_ENABLE_TERMINFO": "OFF",
+  "LLVM_INSTALL_BINUTILS_SYMLINKS": "ON",
+  "LLVM_LINK_LLVM_DYLIB": dylib,
+  "LLVM_TARGETS_TO_BUILD": "X86",
 })
 
 LLVM = struct(
@@ -28,4 +38,9 @@ LLVM = struct(
   version = version, 
   rev     = rev,
   package = tarball(out, name, version, rev),
+  lib     = out + "/lib",
+  include = out + "/include",
+  config  = out + "/bin/llvm-config",
+  tblgen  = out + "/bin/llvm-tblgen",
+  bin     = out + "/bin",
 )
