@@ -1,0 +1,37 @@
+name    = "make"
+version = "3.16.6" 
+rev     = "0"
+
+source = fetch("https://github.com/Kitware/CMake/releases/download/v%s/cmake-%s.tar.gz" % (version, version))
+
+load("host.esp", "HOST")
+load("musl.esp", "MUSL")
+
+out = source + "-out"
+
+_cflags = "--sysroot=%s -O3" % MUSL.sysroot
+cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
+ldflags = "-w -s --static" if BOOTSTRAP else "-w -s"
+
+shell("cd %s; ./bootstrap --parallel=%s --init=../cmake/bootstrap.cmake --prefix=''" % (source, NPROC), env={
+  "DESTDIR": out,
+  "CC": HOST.cc,
+  "CFLAGS": cflags,
+  "LD": HOST.ld,
+  "LDFLAGS": ldflags,
+})
+
+make(source, "-j %s install" % NPROC, env={
+  "DESTDIR": out,
+  "CC": HOST.cc,
+  "CFLAGS": cflags,
+  "LD": HOST.ld,
+  "LDFLAGS": ldflags,
+})
+
+MAKE = struct(
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  package = tarball(out, name, version, rev)
+)
