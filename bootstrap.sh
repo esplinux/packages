@@ -2,7 +2,7 @@
 
 ./clean.sh
 
-espbuild -D BOOTSTRAP linuxHeaders.esp cacert.esp musl.esp compilerRT.esp libunwind.esp libcxx.esp dash.esp awk.esp make.esp curl.esp toybox.esp llvm.esp clang.esp lld.esp
+espbuild -D BOOTSTRAP linuxHeaders.esp cacert.esp musl.esp compilerRT.esp libunwind.esp libcxx.esp dash.esp awk.esp make.esp curl.esp toybox.esp llvm.esp clang.esp lld.esp cmake.esp
 
 mkdir sysroot
 
@@ -22,6 +22,7 @@ tar -C sysroot -xf compiler-rt-*.tgz
 tar -C sysroot -xf libunwind-*.tgz
 tar -C sysroot -xf libcxxabi-*.tgz
 tar -C sysroot -xf libcxx-*.tgz
+tar -C sysroot -xf cmake-*.tgz
 
 cd sysroot
 tar -czf ../sysroot.tgz *
