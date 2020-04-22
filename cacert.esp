@@ -4,9 +4,11 @@ rev = "0"
 
 fetch("https://curl.haxx.se/ca/cacert.pem", "cacert-out/etc/ssl/certs/ca-certificates.crt")
 
+out = path("cacert-out")
+
 CACERT = struct(
   name = name,
   version = version,
   rev = rev,
-  package = tarball(path("cacert-out"), name, version, rev)
+  package = tarball(name, version, rev, out)
 )

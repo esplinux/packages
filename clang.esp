@@ -10,6 +10,7 @@ load("llvm.esp", "LLVM")
 ldflags = "-w -s --static" if BOOTSTRAP else "-w -s"
 static = "ON" if BOOTSTRAP else "OFF"
 dylib = "OFF" if BOOTSTRAP else "ON"
+#lib = LLVM_DEV.lib if BOOTSTRAP else LLVM.lib
 
 out = cmake(source, {
   "CMAKE_ADDR2LINE": HOST.addr2line,
@@ -39,13 +40,13 @@ out = cmake(source, {
   "CLANG_DEFAULT_CXX_STDLIB": "libc++",
   "CLANG_LINK_CLANG_DYLIB": dylib,
   "LIBCLANG_BUILD_STATIC": "ON",
-}, target="install-clang-stripped")
+}, target="install-clang-stripped install-clang-resource-headers-stripped")
 
 CLANG = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(out, name, version, rev),
+  package = tarball(name, version, rev, out),
   cc      = out + "/bin/clang",
   cxx     = out + "/bin/clang++"
 )

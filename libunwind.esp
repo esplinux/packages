@@ -29,7 +29,7 @@ LIBUNWIND = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(out, name, version, rev),
+  package = tarball(name, version, rev, out),
   lib     = out + "/lib",
   include = out + "/include",
 )

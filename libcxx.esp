@@ -33,7 +33,7 @@ LIBCXXABI = struct(
   name    = "libcxxabi", 
   version = version, 
   rev     = rev,
-  package = tarball(abiOut, "libcxxabi", version, rev),
+  package = tarball("libcxxabi", version, rev, abiOut),
   lib     = abiOut + "/lib",
   include = abiSource + "/include",
 )
@@ -64,7 +64,7 @@ LIBCXX = struct(
   name    = "libcxx", 
   version = version, 
   rev     = rev,
-  package = tarball(out, "libcxx", version, rev),
+  package = tarball("libcxx", version, rev, out),
   lib     = out + "/lib",
   include = out + "/include",
 )

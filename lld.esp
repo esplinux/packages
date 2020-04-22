@@ -23,12 +23,12 @@ out = cmake(source, {
   "CMAKE_READELF": HOST.readelf,
   "CMAKE_STRIP": HOST.strip,
   "LLVM_CONFIG_PATH": LLVM.config,
-}, target="install-lld")
+}, target="install-lld-stripped")
 
 LLD = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(out, name, version, rev),
+  package = tarball(name, version, rev, out),
   lld     = out + "/bin/lld",
 )

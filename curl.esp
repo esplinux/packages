@@ -22,16 +22,9 @@ out = automake(source, options, target="install-strip", env={
   "LDFLAGS" : ldflags + " " + bootstrap
 })
 
-dev = source + "-dev"
-shell("mkdir -p %s/bin" % dev)
-shell("cd %s; mv %s/bin/curl-config bin/curl-config" % (dev, out))
-shell("cd %s; mv %s/include ." % (dev, out))
-shell("cd %s; mv %s/lib ." % (dev, out))
-shell("cd %s; mv %s/share ." % (dev, out))
-
 CURL = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  package = tarball(out, name, version, rev)
+  package = tarball(name, version, rev, out)
 )

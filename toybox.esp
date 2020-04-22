@@ -20,5 +20,5 @@ TOYBOX = struct(
   name    = "toybox", 
   version = "HEAD", 
   rev     = "0",
-  package = tarball(out, name, version, rev)
+  package = tarball(name, version, rev, out)
 )

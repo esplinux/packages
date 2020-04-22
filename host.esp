@@ -11,12 +11,12 @@ yaccSource = "https://invisible-mirror.net/archives/byacc/byacc-20200330.tgz"
 pythonSource = "https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz"
 
 def which(command):
-  return shell("which " + command + " | cat").strip(" \n")
+  return shell("which " + command + " | cat", quiet=True).strip(" \n")
 
 def whichVersion(command, llvmVersion):
   commandPath = which(command)
   if commandPath != "":
-    if llvmVersion in shell(commandPath + " --version"):
+    if llvmVersion in shell(commandPath + " --version", quiet=True):
       return commandPath
   return ""
 

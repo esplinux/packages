@@ -11,12 +11,23 @@ out = automake(source, env={
   "RANLIB" : HOST.ranlib
 })
 
+main = ["lib/ld-musl-x86_64.so.1", "lib/libc.so"]
+
+package = tarball(name, version, rev, out, 
+  includes = main
+)
+
+devPackage = tarball(name+"-dev", version, rev, out,
+  excludes = main
+)
+
 MUSL = struct(
-  name    = name, 
-  version = version, 
-  rev     = rev,
-  package = tarball(out, name, version, rev),
-  lib     = out + "/lib",
-  include = out + "/include",
-  sysroot = out
+  name       = name, 
+  version    = version, 
+  rev        = rev,
+  package    = package,
+  devPackage = devPackage,
+  lib        = out + "/lib",
+  include    = out + "/include",
+  sysroot    = out
 )
