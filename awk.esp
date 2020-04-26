@@ -2,9 +2,10 @@ name    = "awk"
 version = "HEAD" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch(git="https://github.com/onetrueawk/awk")
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 tools = "HOSTCC=" + HOST.cc + " YACC='" + HOST.yacc + " -d'"

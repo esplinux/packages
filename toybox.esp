@@ -2,9 +2,10 @@ name    = "toybox"
 version = "HEAD"
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch(git="https://github.com/landley/toybox")
 
-load("host.esp", "HOST")
 load("linuxHeaders.esp", "LINUXHEADERS")
 load("musl.esp", "MUSL")
 

@@ -2,9 +2,9 @@ name    = "libunwind"
 version = "10.0.0"
 rev     = "0"
 
-source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libunwind-%s.src.tar.xz" % (version, version))
-
 load("host.esp", "HOST")
+
+source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libunwind-%s.src.tar.xz" % (version, version))
 
 #-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON \
 #-DLLVM_TOOL_LLVM_RTDYLD_BUILD=OFF \

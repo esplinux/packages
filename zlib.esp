@@ -2,9 +2,10 @@ name    = "zlib"
 version = "1.2.11" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://www.zlib.net/zlib-%s.tar.gz" % version)
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 _cflags = "--sysroot=%s -O3" % MUSL.sysroot

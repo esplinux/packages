@@ -2,9 +2,10 @@ name    = "dash"
 version = "0.5.10.2"
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("http://gondor.apana.org.au/~herbert/dash/files/dash-%s.tar.gz" % version)
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 _cflags = "--sysroot=%s -O3" % MUSL.sysroot

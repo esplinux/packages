@@ -2,15 +2,16 @@ name    = "byacc"
 version = "20200330" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://invisible-mirror.net/archives/byacc/byacc-%s.tgz" % version)
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 _cflags = "--sysroot=%s -O3" % MUSL.sysroot
 cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 
-out = automake(source, env={
+out = automake(source, "--prefix='' --enable-btyacc", env={
   "CC" : HOST.cc,
   "CFLAGS" : cflags,
 })

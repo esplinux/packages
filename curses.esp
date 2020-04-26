@@ -2,9 +2,10 @@ name    = "curses"
 version = "HEAD" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch(git="https://github.com/sabotage-linux/netbsd-curses")
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 out = source + "-out"

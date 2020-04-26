@@ -2,9 +2,10 @@ name    = "make"
 version = "3.81" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://ftp.gnu.org/gnu/make/make-%s.tar.gz" % version)
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 
 _cflags = "--sysroot=%s -O3" % MUSL.sysroot

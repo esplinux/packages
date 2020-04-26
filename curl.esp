@@ -2,9 +2,10 @@ name    = "curl"
 version = "7.69.1" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://curl.haxx.se/download/curl-%s.tar.gz" % version)
 
-load("host.esp", "HOST")
 load("musl.esp", "MUSL")
 load("zlib.esp", "ZLIB")
 load("bearssl.esp", "BEARSSL")

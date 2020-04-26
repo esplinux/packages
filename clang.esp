@@ -2,9 +2,10 @@ name    = "clang"
 version = "10.0.0" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/clang-%s.src.tar.xz" % (version, version))
 
-load("host.esp", "HOST")
 load("llvm.esp", "LLVM")
 
 ldflags = "-w -s --static" if BOOTSTRAP else "-w -s"

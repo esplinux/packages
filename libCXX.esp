@@ -2,11 +2,12 @@ name    = "libcxx"
 version = "10.0.0"
 rev     = "0"
 
+load("host.esp", "HOST")
+
 abiSource = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libcxxabi-%s.src.tar.xz" % (version, version))
 source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/libcxx-%s.src.tar.xz" % (version, version))
 
-load("host.esp", "HOST")
-load("libunwind.esp", "LIBUNWIND")
+load("libUnwind.esp", "LIBUNWIND")
 
 abiOut = cmake(abiSource, {
   "CMAKE_ADDR2LINE": HOST.addr2line,

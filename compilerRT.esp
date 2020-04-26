@@ -2,9 +2,10 @@ name    = "compiler-rt"
 version = "10.0.0" 
 rev     = "0"
 
+load("host.esp", "HOST")
+
 source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%s/compiler-rt-%s.src.tar.xz" % (version, version))
 
-load("host.esp", "HOST")
 #load("llvmSource.esp", "LLVMSOURCE")
 #load("linuxHeaders.esp", "LINUXHEADERS")
 #load("musl.esp", "MUSL")

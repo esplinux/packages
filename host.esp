@@ -13,10 +13,10 @@ pythonSource = "https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz"
 def which(command):
   return shell("which " + command + " | cat", quiet=True).strip(" \n")
 
-def whichVersion(command, llvmVersion):
+def whichVersion(command, version, flag="--version"):
   commandPath = which(command)
   if commandPath != "":
-    if llvmVersion in shell(commandPath + " --version", quiet=True):
+    if version in shell(commandPath + " " + flag, quiet=True):
       return commandPath
   return ""
 
@@ -25,10 +25,10 @@ def hostCMake(source):
     shell("mv " + source + " " + hostSource)
     return cmake(hostSource)
 
-def hostAutomake(source):
+def hostAutomake(source, options="--prefix=''"):
     hostSource = source + "-host"
     shell("mv " + source + " " + hostSource)
-    return automake(hostSource)
+    return automake(hostSource, options)
 
 
 def llvm():
@@ -85,7 +85,7 @@ def yacc():
   if hostYacc != "":
     return hostYacc
   else:
-    hostYaccOut = hostAutomake( fetch(yaccSource) )
+    hostYaccOut = hostAutomake( fetch(yaccSource), "--prefix='' --enable-btyacc" )
     return hostYaccOut + "/bin/yacc"
     
 
@@ -97,9 +97,17 @@ def python():
     hostPythonOut = hostAutomake( fetch(pythonSource) )
     return hostPythonOut + "/bin/python3"
 
+def go():
+  hostGo = whichVersion("go", "1.14", "version")
+  if hostGo != "":
+    return hostGo
+  else:
+    print("Did not find suitable GoLang")
+
 (hostADDR2LINE, hostAR, hostNM, hostOBJCOPY, hostOBJDUMP, hostRANLIB, hostREADELF, hostSTRIP) = llvm()
 (hostCC, hostCXX)  = clang()
 (hostLLD, hostLD)  = lld()
+hostGo = go()
 
 hostPYTHON = python()
 
