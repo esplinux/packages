@@ -11,7 +11,7 @@ out = source + "-out"
 
 _cflags = "--sysroot=%s -O3" % MUSL.sysroot
 cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
-ldflags = "-w -s --static" if BOOTSTRAP else "-w -s"
+ldflags = "-s --static" if BOOTSTRAP else "-s"
 
 shell("cd %s; ./bootstrap --parallel=%s --init=../cmake/bootstrap.cmake --prefix=''" % (source, NPROC), env={
   "DESTDIR": out,

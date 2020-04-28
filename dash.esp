@@ -14,7 +14,7 @@ cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 out = automake(source, env={
   "CC" : HOST.cc,
   "CFLAGS" : cflags,
-  "LDFLAGS" : "-s -w",
+  "LDFLAGS" : "-s",
   "YACC" : HOST.yacc,
 })
 

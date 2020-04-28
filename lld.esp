@@ -8,7 +8,7 @@ source = fetch("https://github.com/llvm/llvm-project/releases/download/llvmorg-%
 
 load("llvm.esp", "LLVM")
 
-ldflags = "-w -s --static" if BOOTSTRAP else "-w -s"
+ldflags = "-s --static" if BOOTSTRAP else "-s"
 
 out = cmake(source, {
   "CMAKE_ADDR2LINE": HOST.addr2line,

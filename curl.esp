@@ -11,7 +11,7 @@ load("zlib.esp", "ZLIB")
 load("bearssl.esp", "BEARSSL")
 
 cflags = "--sysroot=%s -O3 -I%s -I%s" % (MUSL.sysroot, BEARSSL.include, ZLIB.include)
-ldflags = "--sysroot=%s -L%s -L%s -w -s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
+ldflags = "--sysroot=%s -L%s -L%s -s" % (MUSL.sysroot, BEARSSL.lib, ZLIB.lib)
 bootstrap = "--static" if BOOTSTRAP else ""
 
 options = "--prefix='' --with-bearssl --with-zlib --disable-manual --host=none"

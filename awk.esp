@@ -13,7 +13,7 @@ tools = "HOSTCC=" + HOST.cc + " YACC='" + HOST.yacc + " -d'"
 _cflags = "-Qunused-arguments --sysroot=%s -O3" % MUSL.sysroot
 cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 
-target = "CFLAGS='%s' LDFLAGS='-s -w'" % cflags
+target = "CFLAGS='%s' LDFLAGS='-s'" % cflags
 make(source, "-j %s %s %s" % (NPROC, tools, target))
 
 out = path(name + "-out")
