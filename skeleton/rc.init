@@ -1,0 +1,24 @@
+#!/bin/sh
+
+mount -n -t devtmpfs devtmpfs /dev
+mount -n -t proc proc /proc
+mount -n -t sysfs sysfs /sys
+mount -n -t tmpfs tmpfs /run
+
+touch /var/run/utmp
+touch /var/log/btmp
+touch /var/log/lastlog
+touch /var/log/wtmp
+chgrp utmp /var/run/utmp 
+chgrp utmp /var/log/lastlog
+chmod 664 /var/run/utmp
+chmod 664 /var/log/lastlog
+
+/bin/hostname esplinux
+
+#getty 38400 /dev/tty1
+#/bin/sh -c '/bin/respawn /bin/getty 38400 /dev/tty1 linux' &>/dev/null &
+/bin/sh -c '/bin/getty 38400 /dev/tty1 linux' &
+/bin/sh -c '/bin/getty 38400 /dev/tty2 linux' &
+/bin/sh -c '/bin/getty 38400 /dev/tty3 linux' &
+/bin/sh -c '/bin/getty 38400 /dev/tty4 linux' &

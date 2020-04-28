@@ -1,0 +1,37 @@
+load("host.esp", "HOST")
+
+load("dash.esp", "DASH")
+load("toybox.esp", "TOYBOX")
+load("sinit.esp", "SINIT")
+
+def toybox():
+  result = []
+  toyboxFiles = find(TOYBOX.bin)
+  for toyboxFile in toyboxFiles:
+    file = toyboxFile.rsplit("/", 1)[1]
+    if (file != "toybox") and (file != "bin"):
+      exec("echo 'slink /bin/%s /bin/toybox 0777 0 0' >> initramfs" % file)
+
+tools = "CC=" + HOST.cc + " YACC='" + HOST.yacc + " -B' LLVM=1 LLVM_IAS=1"
+
+source = fetch("https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.4.35.tar.xz")
+exec("cd %s; sed 's/--defines=/-H /' -i scripts/Makefile.host" % source)
+make(source, tools + " defconfig")
+
+exec("cp initramfs.template initramfs")
+exec("echo 'file /bin/dash %s/dash 0755 0 0' >> initramfs" % DASH.bin)
+exec("echo 'slink /bin/sh /bin/dash 0777 0 0' >> initramfs")
+exec("echo 'file /bin/toybox %s/toybox 0755 0 0' >> initramfs" % TOYBOX.bin)
+exec("echo 'file /init %s/sinit 0755 0 0' >> initramfs" % SINIT.bin)
+exec("echo 'file /etc/passwd %s 0755 0 0' >> initramfs" % path("skeleton/passwd"))
+exec("echo 'file /etc/group %s 0755 0 0' >> initramfs" % path("skeleton/group"))
+exec("echo 'file /bin/rc.init %s 0755 0 0' >> initramfs" % path("skeleton/rc.init"))
+exec("echo 'file /bin/rc.shutdown %s 0755 0 0' >> initramfs" % path("skeleton/rc.shutdown"))
+
+toybox()
+
+initramfs = path("initramfs")
+
+exec("cd %s; sed 's@CONFIG_INITRAMFS_SOURCE=\"\"@CONFIG_INITRAMFS_SOURCE=\"%s\"@' -i .config" % (source, initramfs))
+
+make(source, "-j" + NPROC + " " + tools)

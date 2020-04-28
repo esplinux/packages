@@ -1,5 +1,6 @@
 llvmVersion = "10.0.0"
 pythonVersion = "3.8"
+yaccVersion = "1.9"
 
 llvmSourceBase = "https://github.com/llvm/llvm-project/releases/download/llvmorg-%s" % llvmVersion
 llvmSourceURL = llvmSourceBase + "/llvm-%s.src.tar.xz" % llvmVersion
@@ -81,7 +82,7 @@ def lld():
     )
 
 def yacc():
-  hostYacc = which("yacc")
+  hostYacc = whichVersion("yacc", yaccVersion, "-V")
   if hostYacc != "":
     return hostYacc
   else:

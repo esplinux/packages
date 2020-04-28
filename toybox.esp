@@ -11,6 +11,14 @@ load("musl.esp", "MUSL")
 
 out = source + "-out"
 
+# Override and enable a few pending toys
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/dhcp.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/getty.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/init.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/route.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/vi.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/xzcat.c" % source)
+
 tools = "CC=" + HOST.cc + " HOSTCC=" + HOST.cc
 _cflags = "-Qunused-arguments --sysroot=%s -I%s -Os" % (MUSL.sysroot, LINUXHEADERS.include)
 cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
@@ -18,8 +26,9 @@ target = "PREFIX=%s/bin defconfig toybox install_flat" % out
 make(source, "%s CFLAGS='%s' %s" % (tools, cflags, target))
 
 TOYBOX = struct(
-  name    = "toybox", 
-  version = "HEAD", 
-  rev     = "0",
+  name    = name, 
+  version = version, 
+  rev     = rev,
+  bin     = out + "/bin",
   package = tarball(name, version, rev, out)
 )

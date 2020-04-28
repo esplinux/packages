@@ -20,5 +20,6 @@ SINIT = struct(
   name    = name, 
   version = version, 
   rev     = rev,
+  bin     = out + "/bin",
   package = tarball(name, version, rev, out)
 )

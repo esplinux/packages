@@ -14,7 +14,7 @@ cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
 out = automake(source, env={
   "CC" : HOST.cc,
   "CFLAGS" : cflags,
-  "LDFLAGS" : "-s",
+  "LDFLAGS" : "--sysroot=%s -s" % MUSL.sysroot,
   "YACC" : HOST.yacc,
 })
 
@@ -24,5 +24,6 @@ DASH = struct(
   name    = name, 
   version = version, 
   rev     = rev,
+  bin     = out + "/bin",
   package = tarball(name, version, rev, out)
 )
