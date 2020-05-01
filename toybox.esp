@@ -16,19 +16,35 @@ exec("cd %s; sed 's/default n/default y/' -i toys/pending/dhcp.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/getty.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/init.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/route.c" % source)
-exec("cd %s; sed 's/default n/default y/' -i toys/pending/vi.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/xzcat.c" % source)
 
 tools = "CC=" + HOST.cc + " HOSTCC=" + HOST.cc
 _cflags = "-Qunused-arguments --sysroot=%s -I%s -Os" % (MUSL.sysroot, LINUXHEADERS.include)
 cflags = "%s --static" % _cflags if BOOTSTRAP else _cflags
-target = "PREFIX=%s/bin defconfig toybox install_flat" % out
-make(source, "%s CFLAGS='%s' %s" % (tools, cflags, target))
+make(source, "%s CFLAGS='%s' defconfig" % (tools, cflags))
+make(source, "%s CFLAGS='%s'" % (tools, cflags))
+#make(source, "%s CFLAGS='%s' PREFIX=%s install" % (tools, cflags, out))
+
+shell("mkdir -p %s/bin" % out)
+shell("mkdir -p %s/sbin" % out)
+shell("cp %s/toybox %s/bin/toybox" % (source, out))
+
+shell("""
+cd %s
+for i in $(bin/toybox --long); do
+  target=$(printf "$i" | sed 's@^usr/@@')
+  if [ $(dirname $target) == bin ]; then
+    ln -s toybox $target
+  else 
+    ln -s ../bin/toybox $target
+  fi
+done
+""" % out)
 
 TOYBOX = struct(
   name    = name, 
   version = version, 
   rev     = rev,
-  bin     = out + "/bin",
+  out     = out,
   package = tarball(name, version, rev, out)
 )

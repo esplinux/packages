@@ -1,0 +1,34 @@
+name    = "nvi" 
+version = "1.79" 
+rev     = "0"
+
+load("host.esp", "HOST")
+
+source = fetch("https://sites.google.com/a/bostic.com/keithbostic/files/nvi-%s.tar.gz" % version)
+
+exec("patch -p1 -i nvi.patch")
+
+load("musl.esp", "MUSL")
+load("curses.esp", "CURSES")
+
+cflags = "--sysroot=%s -O3 -I%s" % (MUSL.sysroot, CURSES.include)
+ldflags = "-L%s" % CURSES.lib
+bootstrap = " --static" if BOOTSTRAP else ""
+
+out = source + "-out"
+
+automake(source + "/build", "--prefix=%s --disable-curses" % out, env={
+  "CC" : HOST.cc,
+  "CFLAGS": cflags + bootstrap,
+  "LDFLAGS": ldflags + bootstrap,
+  "AR" : HOST.ar,
+  "RANLIB" : HOST.ranlib
+})
+
+NVI = struct(
+  name       = name, 
+  version    = version, 
+  rev        = rev,
+  out        = out,
+  package    = tarball(name, version, rev, out),
+)
