@@ -6,6 +6,10 @@ load("host.esp", "HOST")
 
 source = fetch(git="https://github.com/landley/toybox")
 
+# Patch new ifplugd command
+#exec("patch -p1 -i toybox.patch")
+exec("cp ifplugd.c toybox-HEAD/toys/pending")
+
 load("linuxHeaders.esp", "LINUXHEADERS")
 load("musl.esp", "MUSL")
 
@@ -15,7 +19,10 @@ out = source + "-out"
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/dhcp.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/getty.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/init.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/mdev.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/more.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/route.c" % source)
+exec("cd %s; sed 's/default n/default y/' -i toys/pending/sh.c" % source)
 exec("cd %s; sed 's/default n/default y/' -i toys/pending/xzcat.c" % source)
 
 tools = "CC=" + HOST.cc + " HOSTCC=" + HOST.cc

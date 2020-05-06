@@ -37,6 +37,7 @@ DEVMAPPER = struct(
   name       = name, 
   version    = version, 
   rev        = rev,
+  out        = out,
   package    = package,
   devPackage = devPackage,
   docPackage = docPackage,

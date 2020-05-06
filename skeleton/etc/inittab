@@ -2,9 +2,13 @@
 ::sysinit:/bin/mount -n -t proc proc /proc
 ::sysinit:/bin/mount -n -t sysfs sysfs /sys
 ::sysinit:/bin/mount -n -t tmpfs tmpfs /run
+::sysinit:/bin/echo /bin/mdev > /proc/sys/kernel/hotplug
+::sysinit:/bin/mdev -s
+::sysinit:/sbin/ifplugd &
+::sysinit:/bin/echo 0 99999999 | /bin/tee /proc/sys/net/ipv4/ping_group_range
 ::sysinit:/bin/rm -rf /var/tmp/*
 ::sysinit:/bin/hostname -F /etc/hostname
-::sysinit:/sbin/netsetup eth0
+#::sysinit:/sbin/netsetup eth0
 tty1::respawn:/sbin/getty 38400 /dev/tty1 linux
 tty2::respawn:/sbin/getty 38400 /dev/tty2 linux
 tty3::respawn:/sbin/getty 38400 /dev/tty3 linux

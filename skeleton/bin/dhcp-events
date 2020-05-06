@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 # udhcpc script from busybox example modified to work with toybox dhcp
 RESOLV_CONF="/etc/resolv.conf"
 [ -n "$1" ] || { echo "Error: should be called from dhcpc"; exit 1; }

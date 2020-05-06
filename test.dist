@@ -7,9 +7,32 @@ source = fetch("https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-%s.tar.xz" % 
 exec("cd %s; sed 's/--defines=/-H /' -i scripts/Makefile.host" % source)
 make(source, tools + " defconfig")
 
+load("skeleton.esp", "SKELETON")
+load("musl.esp", "MUSL")
+load("devmapper.esp", "DEVMAPPER")
 load("dash.esp", "DASH")
 load("toybox.esp", "TOYBOX")
-load("nvi.esp", "NVI")
+load("cacert.esp", "CACERT")
+load("curl.esp", "CURL")
+load("make.esp", "MAKE")
+load("espbuild.esp", "ESPBUILD")
+
+def getInit(dir):
+  init = []
+  files = find(dir)
+  for file in files:
+    baseFile = file.replace(dir, "")
+    if baseFile != "":
+      if (not isSymlink(file)) and isDir(file):
+        init.append("dir %s 0755 0 0" % baseFile)
+      else:
+        if isSymlink(file):
+          link = lstat(file)
+          init.append("slink %s %s 0777 0 0" % (baseFile, link))
+        else:
+          init.append("file %s %s 0755 0 0" % (baseFile, file))
+
+  return init
 
 def getInitRamFS():
   init = []
@@ -27,25 +50,20 @@ def getInitRamFS():
   init.append("dir /var/log 0755 0 0")
   init.append("slink /var/run /run 0777 0 0")
   init.append("dir /var/tmp 0755 0 0")
-  init.append("nod /dev/console 0644 0 0 c 5 1")
-  init.append("file /bin/dash %s/bin/dash 0755 0 0" % DASH.out)
-  init.append("slink /bin/sh /bin/dash 0777 0 0")
-  init.append("file /bin/toybox %s/bin/toybox 0755 0 0" % TOYBOX.out)
-  init.append("slink /init /sbin/init 0777 0 0")
-  init.append("file /etc/passwd %s 0755 0 0" % path("skeleton/passwd"))
-  init.append("file /etc/group %s 0755 0 0" % path("skeleton/group"))
-  init.append("file /etc/hostname %s 0755 0 0" % path("skeleton/hostname"))
-  init.append("file /etc/inittab %s 0755 0 0" % path("skeleton/inittab"))
-  init.append("file /etc/resolv.conf %s 0755 0 0" % path("skeleton/resolv.conf"))
-  init.append("file /bin/dhcp-events %s 0755 0 0" % path("skeleton/dhcp-events"))
-  init.append("file /sbin/netsetup %s 0755 0 0" % path("skeleton/netsetup"))
-  init.append("file /bin/vi %s/bin/vi 0755 0 0" % NVI.out)
+  init.append("nod /dev/console 0600 0 0 c 5 1")
 
-  toyboxFiles = find(TOYBOX.out)
-  for toyboxFile in toyboxFiles:
-    file = toyboxFile.replace(TOYBOX.out, "")
-    if not contains(["", "/bin", "/bin/toybox", "/sbin"], file):
-      init.append("slink %s /bin/toybox 0777 0 0" % file)
+  init += getInit(SKELETON.out)
+
+  init += getInit(TOYBOX.out)
+  init.append("slink /init /sbin/init 0777 0 0")
+
+  init += getInit(DASH.out)
+  init += getInit(CACERT.out)
+  init += getInit(CURL.out)
+  init += getInit(MUSL.out)
+  init += getInit(DEVMAPPER.out)
+  init += getInit(MAKE.out)
+  init += getInit(ESPBUILD.out)
 
   return init
 
@@ -55,5 +73,6 @@ initramfs = source + "/initramfs"
 
 exec("cd %s; sed 's@CONFIG_INITRAMFS_SOURCE=\"\"@CONFIG_INITRAMFS_SOURCE=\"%s\"@' -i .config" % (source, initramfs))
 exec("cd %s; sed 's@# CONFIG_IGB is not set@CONFIG_IGB=y@' -i .config" % source)
+exec("cd %s; sed 's@# CONFIG_UEVENT_HELPER is not set@CONFIG_UEVENT_HELPER=y@' -i .config" % source)
 
 make(source, "-j" + NPROC + " " + tools)

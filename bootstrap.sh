@@ -2,7 +2,7 @@
 
 ./clean.sh
 
-espbuild -D BOOTSTRAP linuxHeaders.esp cacert.esp musl.esp compilerRT.esp libUnwind.esp libCXX.esp devmapper.esp dash.esp awk.esp make.esp curl.esp toybox.esp llvm.esp clang.esp lld.esp cmake.esp espbuild.esp
+espbuild -D BOOTSTRAP cacert.esp musl.esp compilerRT.esp libUnwind.esp libCXX.esp dash.esp awk.esp make.esp curl.esp toybox.esp llvm.esp clang.esp lld.esp cmake.esp espbuild.esp
 
 mkdir sysroot
 
@@ -10,9 +10,7 @@ tar -C sysroot -xf musl-*.tgz
 tar -C sysroot -xf cacert-*.tgz
 tar -C sysroot -xf toybox-*.tgz
 tar -C sysroot -xf awk-*.tgz
-#tar -C sysroot -xf byacc-*.tgz
 tar -C sysroot -xf dash-*.tgz
-#tar -C sysroot -xf less-*.tgz
 tar -C sysroot -xf make-*.tgz
 tar -C sysroot -xf curl-*.tgz
 tar -C sysroot -xf llvm-*.tgz
@@ -23,7 +21,6 @@ tar -C sysroot -xf libunwind-*.tgz
 tar -C sysroot -xf libcxxabi-*.tgz
 tar -C sysroot -xf libcxx-*.tgz
 tar -C sysroot -xf cmake-*.tgz
-tar -C sysroot -xf devmapper-*.tgz
 tar -C sysroot -xf espbuild-*.tgz
 
 cd sysroot

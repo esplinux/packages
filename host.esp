@@ -81,6 +81,7 @@ def lld():
       hostLLDOut + "/bin/ld.lld",
     )
 
+# Todo add check for btyacc (-B) support
 def yacc():
   hostYacc = whichVersion("yacc", yaccVersion, "-V")
   if hostYacc != "":

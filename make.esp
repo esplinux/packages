@@ -21,5 +21,6 @@ MAKE = struct(
   name    = name, 
   version = version, 
   rev     = rev,
+  out     = out,
   package = tarball(name, version, rev, out)
 )
