@@ -89,7 +89,6 @@ def yacc():
   else:
     hostYaccOut = hostAutomake( fetch(yaccSource), "--prefix='' --enable-btyacc" )
     return hostYaccOut + "/bin/yacc"
-    
 
 def python():
   hostPython = whichVersion("python3", pythonVersion)

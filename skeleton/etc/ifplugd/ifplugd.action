@@ -1,0 +1,39 @@
+#!/bin/sh
+
+iface="$1"
+action="$2"
+
+case "$action" in
+  init)
+    case $iface in
+      "lo")
+        ifconfig "$iface" up
+      ;;
+      "eth"*)
+        ifconfig "$iface" up
+      ;;
+      *) echo "Ignoring interface init for '$iface'"
+    esac
+  ;;
+
+  up)
+    case $iface in
+      "eth"*)
+        dhcp -i "$iface" -s /bin/dhcp-events
+      ;;
+      *) echo "Ignoring interface up for '$iface'"
+    esac
+  ;;
+
+  down)
+    case $iface in
+      "eth"*)
+      ;;
+      *) echo "Ignoring interface down for '$iface'"
+    esac
+  ;;
+
+  *) 
+    echo "Unknown action '$action'"
+    exit 1
+esac

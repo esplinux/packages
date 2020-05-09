@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if ifconfig $1 > /dev/null 2>&1; then
-  ifconfig $1 up
-  sleep 5
-  if grep -q 1 /sys/class/net/$1/carrier; then
-    dhcp -i $1 -s /bin/dhcp-events
-  fi
-fi

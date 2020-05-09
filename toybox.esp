@@ -41,9 +41,9 @@ cd %s
 for i in $(bin/toybox --long); do
   target=$(printf "$i" | sed 's@^usr/@@')
   if [ $(dirname $target) == bin ]; then
-    ln -s toybox $target
+    ln -fs toybox $target
   else 
-    ln -s ../bin/toybox $target
+    ln -fs ../bin/toybox $target
   fi
 done
 """ % out)

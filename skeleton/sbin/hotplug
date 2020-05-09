@@ -1,6 +1,0 @@
-#!/bin/sh
-
-CATEGORY=$1
-
-echo $@ >> /tmp/$CATEGORY
-export >> /tmp/$CATEGORY
